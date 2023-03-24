@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Исполнитель</title>
+</head>
+<body>
+<h1>Текущие данные:</h1>
+<p><b>Водитель: </b>{{ contractor.driver }}</p>
+<p><b>ТС: </b>{{ contractor.vehicle }}</p>
+<p><b>Дата аренды: </b>{{ contractor.renting_date }}</p>
+<h2>Изменить:</h2>
+<form action="{{ contractor.id }}/edit" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <label for="Водитель">Водитель</label>
+        <select id="Водитель" name="driver">
+            {% if drivers %}
+            {% for driver in drivers %}
+            {% if driver.id == contractor.driver.id %}
+            <option value="{{ driver.id }}" selected>{{ driver }}</option>
+            {% else %}
+            <option value="{{ driver.id }}">{{ driver }}</option>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            <option value="null">Нет</option>
+            {% endif %}
+        </select>
+        <label for="ТС">ТС</label>
+        <select id="ТС" name="vehicle">
+            {% if vehicles %}
+            {% for vehicle in vehicles %}
+            {% if vehicle.VIN == contractor.vehicle.VIN %}
+            <option value="{{ vehicle.VIN }}" selected>{{ vehicle }}</option>
+            {% else %}
+            <option value="{{ vehicle.VIN }}">{{ vehicle }}</option>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            <option value="null">Нет</option>
+            {% endif %}
+        </select>
+        <label for="date">Дата аренды</label>
+        <input id="date" type="date" name="renting_date" required>
+        <button type="submit">Сохранить</button>
+    </fieldset>
+</form>
+</body>
+</html>
