@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 
 
@@ -78,11 +80,18 @@ class Driver(models.Model):
     driving_license_validity_period = models.DateField(null=True, blank=True, verbose_name='Срок действия')
     rent_sum = models.IntegerField(null=True, blank=True, verbose_name='Аренда')
     deposit = models.IntegerField(null=True, blank=True, verbose_name='Залог')
-    photo_link = models.CharField(max_length=200, null=True, blank=True, verbose_name='Фото')
-    passport_photo = models.CharField(max_length=200, null=True, blank=True, verbose_name='Фото паспорта')
-    driving_license_photo = models.CharField(max_length=200, null=True, blank=True, verbose_name='Фото прав')
-    rent_photo = models.CharField(max_length=200, null=True, blank=True, verbose_name='Фото паспорта')
     status = models.BooleanField(null=False, blank=True, default=True, verbose_name='Статус')
+
+    def delete(self, *args, **kwargs):
+        for photo in self.driverphoto_set.all():
+            photo.delete()
+        for photo in self.drivinglicensephoto_set.all():
+            photo.delete()
+        for photo in self.driverpassportphoto_set.all():
+            photo.delete()
+        for photo in self.rentingcontractphoto_set.all():
+            photo.delete()
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         if self.name is None:
@@ -92,6 +101,59 @@ class Driver(models.Model):
     class Meta:
         verbose_name_plural = 'Водители'
         verbose_name = 'Водитель'
+
+
+class DriverPhoto(models.Model):
+    photo = models.ImageField(upload_to='drivers/photos/', verbose_name='Фото водителя')
+    driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE, verbose_name='Водитель')
+
+    def filename(self):
+        return os.path.basename(self.photo.name)
+
+    def delete(self, *args, **kwargs):
+        print(self.photo.path)
+        photo_path = self.photo.path
+        os.remove(photo_path)
+        super().delete(*args, **kwargs)
+
+
+class DrivingLicensePhoto(models.Model):
+    photo = models.ImageField(upload_to='drivers/driving_license_photos/', verbose_name='Фото прав')
+    driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE, verbose_name='Водитель')
+
+    def filename(self):
+        return os.path.basename(self.photo.name)
+
+    def delete(self, *args, **kwargs):
+        photo_path = self.photo.path
+        os.remove(photo_path)
+        super().delete(*args, **kwargs)
+
+
+class DriverPassportPhoto(models.Model):
+    photo = models.ImageField(upload_to='drivers/passports/', verbose_name='Фото паспорта')
+    driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE, verbose_name='Водитель')
+
+    def filename(self):
+        return os.path.basename(self.photo.name)
+
+    def delete(self, *args, **kwargs):
+        photo_path = self.photo.path
+        os.remove(photo_path)
+        super().delete(*args, **kwargs)
+
+
+class RentingContractPhoto(models.Model):
+    photo = models.ImageField(upload_to='drivers/renting_contracts/', verbose_name='Фото договора аренды')
+    driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE, verbose_name='Водитель')
+
+    def filename(self):
+        return os.path.basename(self.photo.name)
+
+    def delete(self, *args, **kwargs):
+        photo_path = self.photo.path
+        os.remove(photo_path)
+        super().delete(*args, **kwargs)
 
 
 class Vehicle(models.Model):
@@ -120,6 +182,50 @@ class Vehicle(models.Model):
     class Meta:
         verbose_name_plural = 'Автомобили'
         verbose_name = 'Автомобиль'
+
+
+class RegistrationCertificateScan(models.Model):
+    photo = models.ImageField(upload_to='vehicles/Сканы_СТС', verbose_name='Скан СТС')
+    vehicle = models.ForeignKey(to='Vehicle', on_delete=models.CASCADE, verbose_name='ТС')
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            this_vehicle_photos = RegistrationCertificateScan.objects.filter(vehicle=self.vehicle)
+            self.photo.name = f'{self.vehicle}_скан_СТС_{len(this_vehicle_photos) + 1}.jpg'
+        else:
+            existing_photo = RegistrationCertificateScan.objects.get(pk=self.pk)
+            photo_path = existing_photo.photo.path
+            postfix = photo_path.split('_')[-1]
+            os.remove(photo_path)
+            self.photo.name = f'{self.vehicle}_скан_СТС_{postfix}'
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        photo_path = self.photo.path
+        os.remove(photo_path)
+        super().delete(*args, **kwargs)
+
+
+class VehiclePassportScan(models.Model):
+    photo = models.ImageField(upload_to='vehicles/Сканы_ПТС', verbose_name='Скан ПТС')
+    vehicle = models.ForeignKey(to='Vehicle', on_delete=models.CASCADE, verbose_name='ТС')
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            this_vehicle_photos = VehiclePassportScan.objects.filter(vehicle=self.vehicle)
+            self.photo.name = f'{self.vehicle}_скан_ПТС_{len(this_vehicle_photos) + 1}.jpg'
+        else:
+            existing_photo = VehiclePassportScan.objects.get(pk=self.pk)
+            photo_path = existing_photo.photo.path
+            postfix = photo_path.split('_')[-1]
+            os.remove(photo_path)
+            self.photo.name = f'{self.vehicle}_скан_ПТС_{postfix}'
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        photo_path = self.photo.path
+        os.remove(photo_path)
+        super().delete(*args, **kwargs)
 
 
 class VehicleType(models.Model):

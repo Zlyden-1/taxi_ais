@@ -14,4 +14,8 @@ admin.site.register(models.Expense)
 admin.site.register(models.AccidentStatus)
 admin.site.register(models.ExpenseStatus)
 admin.site.register(models.RentStatus)
+admin.site.register(models.DriverPassportPhoto)
+admin.site.register(models.DriverPhoto)
+admin.site.register(models.DrivingLicensePhoto)
+admin.site.register(models.RentingContractPhoto)
 # Register your models here.
