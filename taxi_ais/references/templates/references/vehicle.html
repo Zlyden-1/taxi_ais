@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Транспортное средство</title>
+</head>
+<body>
+<h1>ТС {{ object }}</h1>
+<p>VIN: {{ object.VIN }}</p>
+<p>Гос. номер: {{ object.license_plate }}</p>
+<p>№ СТС: {{ object.registration_certificate_id }}</p>
+<p>№ ПТС: {{ object.vehicle_passport_id }}</p>
+<p>№ двигателя: {{ object.engine_id }}</p>
+<p>Цвет: {{ object.color }}</p>
+<p>№ ДЛ: {{ object.leasing_contract_id }}</p>
+<p>Серия полиса: {{ object.insurance_policy_series }}</p>
+<p>Номер полиса: {{ object.insurance_policy_id }}</p>
+<p>Дата ДЛ: {{ object.leasing_contract_date }}</p>
+<p>Лизингодатель: {{ object.lessor }}</p>
+<p>Марка: {{ object.vehicle_type.brand }}</p>
+<p>Модель: {{ object.vehicle_type.model }}</p>
+<p>Год выпуска: {{ object.manufacture_year }}</p>
+<p>Скан СТС:
+    {% if object.registration_certificate_scan %}
+    <a href="{{ object.registration_certificate_scan.url }}"
+                download="{{ object.registration_certificate_scan.name }}">{{ object.rc_filename }}</a></p>
+    {% else %}
+    -
+    {% endif %}
+<p>Скан ПТС:
+    {% if object.vehicle_passport_scan %}
+    <a href="{{ object.vehicle_passport_scan.url }}"
+                download="{{ object.vehicle_passport_scan.name }}">{{ object.vp_filename }}</a></p>
+    {% else %}
+    -
+    {% endif %}
+<p>Статус: {% if object.status %}Активно{% else %}Неактивно{% endif %}</p>
+<h2>Изменить</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Изменить">
+</form>
+</body>
+</html>

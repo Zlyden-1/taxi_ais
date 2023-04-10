@@ -1,12 +1,13 @@
 import os
 
 from django.db import models
+from django.conf import settings
 
 
 class Order(models.Model):
     ID = models.IntegerField(primary_key=True, null=False, blank=False)
     client = models.ForeignKey(to='Client', on_delete=models.PROTECT,
-                                           null=False, blank=False, verbose_name='ИНН заказчика')
+                               null=False, blank=False, verbose_name='ИНН заказчика')
     contractor = models.ForeignKey(to='Contractor', on_delete=models.PROTECT,
                                    null=False, blank=False, verbose_name='Исполнитель')
     order_time = models.DateTimeField(null=False, blank=False, verbose_name='Время заказа')
@@ -171,10 +172,37 @@ class Vehicle(models.Model):
     vehicle_type = models.ForeignKey(to='VehicleType', on_delete=models.PROTECT,
                                      null=True, blank=True, verbose_name='Тип ТС')
     manufacture_year = models.IntegerField(null=True, blank=True, verbose_name='Год выпуска')
-    registration_certificate_scan = models.CharField(max_length=200,
+    registration_certificate_scan = models.FileField(upload_to='vehicles/registration_certificates/',
                                                      null=True, blank=True, verbose_name='Скан СТС')
-    vehicle_passport_scan = models.CharField(max_length=200, null=True, blank=True, verbose_name='Скан ПТС')
+    vehicle_passport_scan = models.FileField(upload_to='vehicles/vehicle_passports/',
+                                             null=True, blank=True, verbose_name='Скан ПТС')
     status = models.BooleanField(null=False, blank=True, default=True, verbose_name='Статус')
+
+    def rc_filename(self):
+        return os.path.basename(self.registration_certificate_scan.name)
+
+    def vp_filename(self):
+        return os.path.basename(self.vehicle_passport_scan.name)
+
+    def save(self, *args, **kwargs):
+        if self.registration_certificate_scan:
+            rc_postfix = self.registration_certificate_scan.name.split('.')[-1]
+            self.registration_certificate_scan.name = f'{self.VIN}_скан_СТС.{rc_postfix}'
+        if self.vehicle_passport_scan:
+            vp_postfix = self.vehicle_passport_scan.name.split('.')[-1]
+            self.vehicle_passport_scan.name = f'{self.VIN}_скан_ПТС.{vp_postfix}'
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.registration_certificate_scan:
+            rc_path = os.path.join(settings.MEDIA_ROOT,
+                                   f'vehicles\\registration_certificates\\{self.registration_certificate_scan.name}')
+            os.remove(rc_path)
+        if self.vehicle_passport_scan:
+            vp_path = os.path.join(settings.MEDIA_ROOT,
+                                   f'vehicles\\vehicle_passports\\{self.vehicle_passport_scan.name}')
+            os.remove(vp_path)
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f'{self.vehicle_type.model} {self.VIN}'

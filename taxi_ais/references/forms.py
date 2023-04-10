@@ -1,5 +1,5 @@
 from django import forms
-from .models import Driver, DriverPassportPhoto, DrivingLicensePhoto, DriverPhoto, RentingContractPhoto
+from .models import Driver, Vehicle
 
 
 class DriverForm(forms.Form):
@@ -41,9 +41,20 @@ class UpdateDriverForm(forms.ModelForm):
 
 class CreateVehicleForm(forms.ModelForm):
     class Meta:
-        model = Driver
-        fields = ('second_name', 'first_name', 'patronimic', 'name', 'citizenship', 'passport_id',
-                  'passport_issue_date', 'date_of_birth', 'place_of_birth', 'residence_place', 'phone_number',
-                  'driving_license_id', 'driving_license_category', 'driving_license_validity_period', 'rent_sum',
-                  'deposit', 'status')
+        model = Vehicle
+        fields = ('VIN', 'license_plate', 'registration_certificate_id', 'vehicle_passport_id', 'engine_id', 'color',
+                  'leasing_contract_id', 'insurance_policy_series', 'insurance_policy_id', 'leasing_contract_date',
+                  'lessor', 'vehicle_type', 'manufacture_year', 'registration_certificate_scan',
+                  'vehicle_passport_scan')
+        widgets = {'registration_certificate_scan': forms.FileInput(attrs={'accept': '.pdf'}),
+                   'vehicle_passport_scan': forms.FileInput(attrs={'accept': '.pdf'})}
 
+
+class UpdateVehicleForm(forms.ModelForm):
+    class Meta:
+        model = Vehicle
+        fields = ('VIN', 'license_plate', 'registration_certificate_id', 'vehicle_passport_id', 'engine_id', 'color',
+                  'leasing_contract_id', 'insurance_policy_series', 'insurance_policy_id', 'leasing_contract_date',
+                  'lessor', 'vehicle_type', 'manufacture_year', 'registration_certificate_scan',
+                  'vehicle_passport_scan', 'status')
+        widgets = {'status': forms.Select(choices=((True, 'Активно'), (False, 'Неактивно')))}

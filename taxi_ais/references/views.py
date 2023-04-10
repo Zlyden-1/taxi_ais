@@ -5,11 +5,14 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.core.files.base import ContentFile
 from django.views.generic.edit import UpdateView, DeleteView, CreateView
-from django.views.generic.list import MultipleObjectTemplateResponseMixin
 
-from .forms import DriverForm, UpdateDriverForm
+from .forms import DriverForm, UpdateDriverForm, CreateVehicleForm, UpdateVehicleForm
 from .models import Contractor, Driver, Vehicle, DriverPassportPhoto, DriverPhoto, DrivingLicensePhoto, \
     RentingContractPhoto
+
+
+def index(request):
+    return render(request, 'references/index.html')
 
 
 def contractors(request):
@@ -194,6 +197,48 @@ def add_renting_contract_photo(request, pk):
     return HttpResponseRedirect(reverse('contractors:driver', kwargs={'pk': pk}))
 
 
-class Vehicles(CreateView, MultipleObjectTemplateResponseMixin):
+class Vehicles(CreateView):
     model = Vehicle
-    queryset = Vehicle.objects.all()
+    form_class = CreateVehicleForm
+    template_name = 'references/vehicles.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicles'] = Vehicle.objects.all()
+        return context
+
+    def form_valid(self, form):
+        vehicle = Vehicle.objects.create(VIN=form.cleaned_data['VIN'],
+                                         license_plate=form.cleaned_data['license_plate'],
+                                         registration_certificate_id=form.cleaned_data['registration_certificate_id'],
+                                         vehicle_passport_id=form.cleaned_data['vehicle_passport_id'],
+                                         engine_id=form.cleaned_data['engine_id'],
+                                         color=form.cleaned_data['color'],
+                                         leasing_contract_id=form.cleaned_data['leasing_contract_id'],
+                                         insurance_policy_series=form.cleaned_data['insurance_policy_series'],
+                                         insurance_policy_id=form.cleaned_data['insurance_policy_id'],
+                                         leasing_contract_date=form.cleaned_data['leasing_contract_date'],
+                                         lessor=form.cleaned_data['lessor'],
+                                         vehicle_type=form.cleaned_data['vehicle_type'],
+                                         manufacture_year=form.cleaned_data['manufacture_year'],
+                                         registration_certificate_scan=form.cleaned_data[
+                                             'registration_certificate_scan'],
+                                         vehicle_passport_scan=form.cleaned_data['vehicle_passport_scan'],
+                                         status=True)
+        vehicle.save()
+        return HttpResponseRedirect(redirect_to='/references/vehicles')
+
+
+class VehicleDetail(UpdateView):
+    model = Vehicle
+    form_class = UpdateVehicleForm
+    template_name = 'references/vehicle.html'
+
+    def get_success_url(self):
+        return reverse_lazy('contractors:vehicle', kwargs={'pk': self.object.pk})
+
+    
+class VehicleDeleteView(DeleteView):
+    model = Vehicle
+    success_url = reverse_lazy('contractors:vehicles')
+

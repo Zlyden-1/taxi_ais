@@ -26,9 +26,9 @@ MEDIA_URL = '/media/'
 SECRET_KEY = 'django-insecure-ob$1w(igs!$l&t=01b6a1og-4r4ub4glp^%=9te7!qhrv+9fx)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['80.78.244.52', '80-78-244-52.cloudvps.regruhosting.ru']
 
 
 # Application definition
@@ -83,8 +83,8 @@ DATABASES = {
         'NAME': 'taxi_ais',
         'USER': 'postgres',
         'PASSWORD': 'admin',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'HOST': 'db',
+        'PORT': '',
     }
 }
 
@@ -123,6 +123,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = 'static/'
 
 # Default primary key field type
