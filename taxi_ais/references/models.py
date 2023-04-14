@@ -205,7 +205,7 @@ class Vehicle(models.Model):
         super().delete(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.vehicle_type.model} {self.VIN}'
+        return f'{self.vehicle_type.model} {self.license_plate}'
 
     class Meta:
         verbose_name_plural = 'Автомобили'
