@@ -26,9 +26,9 @@ MEDIA_URL = '/media/'
 SECRET_KEY = 'django-insecure-ob$1w(igs!$l&t=01b6a1og-4r4ub4glp^%=9te7!qhrv+9fx)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['80.78.244.52', '80-78-244-52.cloudvps.regruhosting.ru']
+ALLOWED_HOSTS = ['80.78.244.52', '80-78-244-52.cloudvps.regruhosting.ru', '127.0.0.1']
 
 
 # Application definition

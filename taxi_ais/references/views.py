@@ -1,14 +1,13 @@
-from django.shortcuts import render, reverse
+from django.shortcuts import render, reverse, get_object_or_404
 from django.urls import reverse_lazy
-from django.forms import modelformset_factory
-from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.core.files.base import ContentFile
 from django.views.generic.edit import UpdateView, DeleteView, CreateView
+from django.utils import timezone
 
-from .forms import DriverForm, UpdateDriverForm, CreateVehicleForm, UpdateVehicleForm
+from .forms import DriverForm, UpdateDriverForm, CreateVehicleForm, UpdateVehicleForm, CreateRentPaymentForm
 from .models import Contractor, Driver, Vehicle, DriverPassportPhoto, DriverPhoto, DrivingLicensePhoto, \
-    RentingContractPhoto
+    RentingContractPhoto, Rent
 
 
 def index(request):
@@ -19,7 +18,8 @@ def contractors(request):
     contractors_list = Contractor.objects.all().order_by('-renting_date')
     context = {'contractors': contractors_list,
                'drivers': Driver.objects.filter(status=True),
-               'vehicles': Vehicle.objects.filter(status=True)}
+               'vehicles': Vehicle.objects.filter(status=True),
+               }
     return render(request, 'references/contractors.html', context)
 
 
@@ -38,18 +38,46 @@ def add_contractor(request):
 
 
 def contractor_detail(request, pk):
-    contractor = Contractor.objects.get(pk=pk)
+    contractor = get_object_or_404(Contractor, pk=pk)
     drivers = Driver.objects.all()
     vehicles = Vehicle.objects.all()
+    try:
+        balance = contractor.rent_set.latest('payment_date').balance
+    except Rent.DoesNotExist:
+        balance = 'Нет данных'
     context = {'contractor': contractor,
                'drivers': drivers,
-               'vehicles': vehicles}
+               'vehicles': vehicles,
+               'balance': balance,
+               'rents': contractor.rent_set.all()[:10]}
     return render(request, 'references/contractor.html', context)
+
+
+def add_contractor_rent(request, pk):
+    contractor = get_object_or_404(Contractor, pk=pk)
+    payment_date = timezone.now().date()
+    rent = Rent(contractor=contractor, payment_date=payment_date)
+    try:
+        summ = request.POST['summ']
+    except KeyError:
+        return render(request, 'references/error.html', {
+            'error_message': "Вы не ввели сумму",
+        })
+    else:
+        rent.summ = summ
+        try:
+            previous_rent = Rent.objects.filter(contractor=rent.contractor).latest('payment_date')
+            balance = previous_rent.balance + rent.summ
+        except Rent.DoesNotExist:
+            balance = rent.summ
+        rent.balance = balance
+        rent.save()
+        return HttpResponseRedirect(redirect_to=f'/references/contractor/{contractor.pk}')
 
 
 def edit_contractor(request, pk):
     try:
-        contractor = Contractor.objects.get(pk=pk)
+        contractor = get_object_or_404(Contractor, pk=pk)
         contractor.driver = Driver.objects.get(pk=request.POST['driver'])
         contractor.vehicle = Vehicle.objects.get(pk=request.POST['vehicle'])
         contractor.renting_date = request.POST['renting_date']
@@ -93,7 +121,7 @@ def drivers(request):
                                                'driving_license_validity_period'],
                                            rent_sum=form.cleaned_data['rent_sum'],
                                            deposit=form.cleaned_data['deposit'],
-                                           status=True,)
+                                           status=True, )
             save_photos(driver, request, DriverPassportPhoto, 'passport_photo')
             save_photos(driver, request, DriverPhoto, 'photo')
             save_photos(driver, request, DrivingLicensePhoto, 'license_photo')
@@ -129,7 +157,7 @@ def active_drivers(request):
                                                'driving_license_validity_period'],
                                            rent_sum=form.cleaned_data['rent_sum'],
                                            deposit=form.cleaned_data['deposit'],
-                                           status=True,)
+                                           status=True, )
             save_photos(driver, request, DriverPassportPhoto, 'passport_photo')
             save_photos(driver, request, DriverPhoto, 'photo')
             save_photos(driver, request, DrivingLicensePhoto, 'license_photo')
@@ -296,6 +324,7 @@ class ActiveVehicles(CreateView):
         vehicle.save()
         return HttpResponseRedirect(redirect_to='/references/vehicles/active')
 
+
 class VehicleDetail(UpdateView):
     model = Vehicle
     form_class = UpdateVehicleForm
@@ -304,8 +333,29 @@ class VehicleDetail(UpdateView):
     def get_success_url(self):
         return reverse_lazy('contractors:vehicle', kwargs={'pk': self.object.pk})
 
-    
+
 class VehicleDeleteView(DeleteView):
     model = Vehicle
     success_url = reverse_lazy('contractors:vehicles')
 
+
+class RentList(CreateView):
+    model = Rent
+    form_class = CreateRentPaymentForm
+    template_name = 'references/rent_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['rent_list'] = Rent.objects.all()
+        return context
+
+    def form_valid(self, form):
+        rent = form.save(commit=False)
+        try:
+            previous_rent = Rent.objects.filter(contractor=rent.contractor).latest('payment_date')
+            balance = previous_rent.balance + rent.summ
+        except Rent.DoesNotExist:
+            balance = rent.summ
+        rent.balance = balance
+        rent.save()
+        return HttpResponseRedirect(redirect_to='/references/rent_list')

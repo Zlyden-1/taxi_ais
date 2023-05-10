@@ -1,16 +1,29 @@
 version: '3'
 services:
   db:
-   image: postgres
-   restart: always
-   environment:
-     POSTGRES_USER: postgres
-     POSTGRES_PASSWORD: admin
-     POSTGRES_DB: taxi_ais
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: taxi_ais
+    volumes:
+      - database:/var/lib/postgresql/data
+
   web:
-   image: m4vdoshin/taxi_ais:4
-   command: python manage.py runserver 0.0.0.0:8000
-   ports:
-     - "8000:8000"
-   depends_on:
-     - db
+    image: m4vdoshin/taxi_ais:1.2
+    volumes:
+      - media:/taxi_ais/media
+    command:
+      python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    links:
+      - db
+
+volumes:
+  database:
+    driver: local
+  media:

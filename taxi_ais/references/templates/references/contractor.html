@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Исполнитель</title>
@@ -9,8 +9,9 @@
 <p><b>Водитель: </b>{{ contractor.driver }}</p>
 <p><b>ТС: </b>{{ contractor.vehicle }}</p>
 <p><b>Дата аренды: </b>{{ contractor.renting_date }}</p>
+<p><b>Баланс: </b>{{ balance }}</p>
 <h2>Изменить:</h2>
-<form action="{{ contractor.id }}/edit" method="post">
+<form action="{% url 'references:edit_contractor' contractor.pk %}" method="post">
     {% csrf_token %}
     <fieldset>
         <label for="Водитель">Водитель</label>
@@ -46,5 +47,33 @@
         <button type="submit">Сохранить</button>
     </fieldset>
 </form>
+<h2>Добавить выплату по аренде:</h2>
+<form action="{% url 'references:add_rent' contractor.pk %}" method="post">
+    {% csrf_token %}
+    <label for="summ">Сумма: </label>
+    <input id="summ" type="number" name="summ" required>
+    <button type="submit">Добавить</button>
+</form>
+<h2>Последние 10 операций по аренде:</h2>
+<div>
+    {% if rents %}
+    <table border="1">
+        <tr>
+            <td>Дата</td>
+            <td>Сумма операции</td>
+            <td>Баланс</td>
+        </tr>
+        {% for rent in rents %}
+        <tr>
+            <td>{{ rent.payment_date }}</td>
+            <td>{{ rent.summ }}</td>
+            <td>{{ rent.balance }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Операций по аренде пока нет.</p>
+    {% endif %}
+</div>
 </body>
 </html>

@@ -8,6 +8,7 @@ urlpatterns = [
     path('references/contractors/', views.contractors, name='Contractors'),
     path('references/add_contractor/', views.add_contractor, name='add_contractor'),
     path('references/contractor/<int:pk>', views.contractor_detail, name='contractor'),
+    path('references/contractor/<int:pk>/add_rent', views.add_contractor_rent, name='add_rent'),
     path('references/contractor/<int:pk>/edit', views.edit_contractor, name='edit_contractor'),
     path('references/contractor/<int:pk>/delete', views.delete_contractor, name='delete_contractor'),
     path('references/drivers/', views.drivers, name='drivers'),
@@ -29,4 +30,5 @@ urlpatterns = [
     path('references/vehicles/active', views.ActiveVehicles.as_view(), name='active_vehicles'),
     path('references/vehicle/<str:pk>', views.VehicleDetail.as_view(), name='vehicle'),
     path('references/vehicle/<str:pk>/delete', views.VehicleDeleteView.as_view(), name='delete_vehicle'),
+    path('references/rent_list/', views.RentList.as_view(), name='rent_list'),
 ]

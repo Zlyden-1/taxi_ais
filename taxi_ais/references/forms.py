@@ -1,6 +1,6 @@
 from django import forms
-from .models import Driver, Vehicle
-
+from .models import Driver, Vehicle, Rent, Contractor
+from django.utils import timezone
 
 class DriverForm(forms.Form):
     second_name = forms.CharField(max_length=50, required=False, label='Фамилия')
@@ -58,3 +58,14 @@ class UpdateVehicleForm(forms.ModelForm):
                   'lessor', 'vehicle_type', 'manufacture_year', 'registration_certificate_scan',
                   'vehicle_passport_scan', 'status')
         widgets = {'status': forms.Select(choices=((True, 'Активно'), (False, 'Неактивно')))}
+
+
+class CreateRentPaymentForm(forms.ModelForm):
+    contractor = forms.ModelChoiceField(Contractor.objects.all())
+    payment_date = forms.DateField(widget=forms.DateInput(attrs={'readonly': True}), initial=timezone.now().date())
+    sum = forms.IntegerField()
+
+    class Meta:
+        fields = ('contractor', 'payment_date', 'sum')
+        model = Rent
+

@@ -279,8 +279,6 @@ class Rent(models.Model):
     payment_date = models.DateField(null=False, blank=False, verbose_name='Дата')
     summ = models.FloatField(null=False, blank=False, verbose_name='Сумма')
     balance = models.FloatField(null=True, blank=False, verbose_name='Баланс')
-    status = models.ForeignKey(to='RentStatus', on_delete=models.PROTECT,
-                               null=False, blank=False, verbose_name='Статус')
 
     def __str__(self):
         return f'{self.contractor} {self.payment_date}'
@@ -320,17 +318,6 @@ class Expense(models.Model):
     class Meta:
         verbose_name_plural = 'Затраты'
         verbose_name = 'Затрата'
-
-
-class RentStatus(models.Model):
-    status = models.CharField(max_length=40, primary_key=True, null=False, blank=False, verbose_name='Статус')
-
-    def __str__(self):
-        return self.status
-
-    class Meta:
-        verbose_name_plural = 'Статусы аренды'
-        verbose_name = 'Статус аренды'
 
 
 class AccidentStatus(models.Model):
