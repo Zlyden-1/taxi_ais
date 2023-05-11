@@ -19,7 +19,6 @@
         <tr>
             <td>Перевозчик</td>
             <td>Дата</td>
-<!--            <td>Тип операции</td>-->
             <td>Сумма</td>
             <td>Баланс</td>
         </tr>
@@ -27,8 +26,7 @@
         <tr>
             <td>{{ rent.contractor }}</td>
             <td>{{ rent.payment_date }}</td>
-<!--            <td>{% if rent.sum >= 0 %} Погашение аренды {% else %} Начисление аренды {% endif %}</td>-->
-            <td>{{ rent.sum }}</td>
+            <td>{{ rent.summ }}</td>
             <td>{{ rent.balance }}</td>
         </tr>
         {% endfor %}

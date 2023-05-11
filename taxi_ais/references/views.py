@@ -66,8 +66,11 @@ def add_contractor_rent(request, pk):
     else:
         rent.summ = summ
         try:
-            previous_rent = Rent.objects.filter(contractor=rent.contractor).latest('payment_date')
-            balance = previous_rent.balance + rent.summ
+            previous_rent = Rent.objects.order_by('-payment_date').first()
+            if previous_rent is None:
+                balance = rent.summ
+            else:
+                balance = previous_rent.balance + rent.summ
         except Rent.DoesNotExist:
             balance = rent.summ
         rent.balance = balance
@@ -352,8 +355,11 @@ class RentList(CreateView):
     def form_valid(self, form):
         rent = form.save(commit=False)
         try:
-            previous_rent = Rent.objects.filter(contractor=rent.contractor).latest('payment_date')
-            balance = previous_rent.balance + rent.summ
+            previous_rent = Rent.objects.order_by('-payment_date').first()
+            if previous_rent is None:
+                balance = rent.summ
+            else:
+                balance = previous_rent.balance + rent.summ
         except Rent.DoesNotExist:
             balance = rent.summ
         rent.balance = balance
