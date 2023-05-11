@@ -18,7 +18,7 @@ def add_rent_task():
             balance = summ
         rent = Rent.objects.create(
             contractor=contractor,
-            payment_date=timezone.now().date(),
+            payment_date=timezone.now(),
             summ=-contractor.vehicle.vehicle_type.rent_price,
         )
         rent.balance = balance
