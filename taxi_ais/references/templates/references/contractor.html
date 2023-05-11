@@ -65,7 +65,7 @@
         </tr>
         {% for rent in rents %}
         <tr>
-            <td>{{ rent.payment_date }}</td>
+            <td>{{ rent.payment_date|date:"d.m.Y" }}</td>
             <td>{{ rent.summ }}</td>
             <td>{{ rent.balance }}</td>
         </tr>

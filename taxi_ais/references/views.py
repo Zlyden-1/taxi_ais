@@ -49,7 +49,7 @@ def contractor_detail(request, pk):
                'drivers': drivers,
                'vehicles': vehicles,
                'balance': balance,
-               'rents': contractor.rent_set.all()[:10]}
+               'rents': contractor.rent_set.order_by('-payment_date')[:10]}
     return render(request, 'references/contractor.html', context)
 
 
@@ -347,7 +347,7 @@ class RentList(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['rent_list'] = Rent.objects.all()
+        context['rent_list'] = Rent.objects.order_by('-payment_date')
         return context
 
     def form_valid(self, form):
