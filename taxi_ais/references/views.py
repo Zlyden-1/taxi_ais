@@ -55,8 +55,7 @@ def contractor_detail(request, pk):
 
 def add_contractor_rent(request, pk):
     contractor = get_object_or_404(Contractor, pk=pk)
-    payment_date = timezone.now().date()
-    rent = Rent(contractor=contractor, payment_date=payment_date)
+    payment_date = timezone.now()
     try:
         summ = request.POST['summ']
     except KeyError:
@@ -64,16 +63,15 @@ def add_contractor_rent(request, pk):
             'error_message': "Вы не ввели сумму",
         })
     else:
-        rent.summ = summ
         try:
             previous_rent = Rent.objects.order_by('-payment_date').first()
             if previous_rent is None:
-                balance = rent.summ
+                balance = summ
             else:
-                balance = previous_rent.balance + rent.summ
+                balance = previous_rent.balance + summ
         except Rent.DoesNotExist:
-            balance = rent.summ
-        rent.balance = balance
+            balance = summ
+        rent = Rent(contractor=contractor, payment_date=payment_date, summ=summ, balance=balance)
         rent.save()
         return HttpResponseRedirect(redirect_to=f'/references/contractor/{contractor.pk}')
 
@@ -353,14 +351,15 @@ class RentList(CreateView):
         return context
 
     def form_valid(self, form):
-        rent = form.save(commit=False)
         try:
             previous_rent = Rent.objects.order_by('-payment_date').first()
+            rent = form.save(commit=False)
             if previous_rent is None:
                 balance = rent.summ
             else:
                 balance = previous_rent.balance + rent.summ
         except Rent.DoesNotExist:
+            rent = form.save(commit=False)
             balance = rent.summ
         rent.balance = balance
         rent.save()

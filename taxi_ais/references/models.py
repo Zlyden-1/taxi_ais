@@ -276,7 +276,7 @@ class VehicleType(models.Model):
 class Rent(models.Model):
     contractor = models.ForeignKey(to='Contractor', on_delete=models.PROTECT,
                                    null=True, blank=False, verbose_name='Исполнитель')
-    payment_date = models.DateField(null=False, blank=False, verbose_name='Дата')
+    payment_date = models.DateTimeField(null=False, blank=False, verbose_name='Дата')
     summ = models.FloatField(null=False, blank=False, verbose_name='Сумма')
     balance = models.FloatField(null=True, blank=False, verbose_name='Баланс')
 
