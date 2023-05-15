@@ -34,7 +34,9 @@
     {% else %}
     -
     {% endif %}
-<p>Статус: {% if object.status %}Активно{% else %}Неактивно{% endif %}</p>
+<p>Статус: {{ object.status }}</p>
+<p>Место базирования: {{ object.location }}</p>
+<p>Вид использования: {{ object.get_rent_type_display }}</p>
 <h2>Изменить</h2>
 <form method="post">
     {% csrf_token %}

@@ -82,6 +82,7 @@ class Driver(models.Model):
     rent_sum = models.IntegerField(null=True, blank=True, verbose_name='Аренда')
     deposit = models.IntegerField(null=True, blank=True, verbose_name='Залог')
     status = models.BooleanField(null=False, blank=True, default=True, verbose_name='Статус')
+    comment = models.TextField(null=True, blank=True, verbose_name='Комментарий')
 
     def delete(self, *args, **kwargs):
         for photo in self.driverphoto_set.all():
@@ -158,6 +159,8 @@ class RentingContractPhoto(models.Model):
 
 
 class Vehicle(models.Model):
+    rent_type_choices = [('А', 'Аренда'), ('В', 'Выкуп')]  # А и В здесь - русские буквы
+
     VIN = models.CharField(max_length=50, primary_key=True, null=False, blank=False)
     license_plate = models.CharField(max_length=10, null=True, blank=True, verbose_name='Гос. номер')
     registration_certificate_id = models.CharField(max_length=100, null=True, blank=True, verbose_name='№ СТС')
@@ -176,7 +179,12 @@ class Vehicle(models.Model):
                                                      null=True, blank=True, verbose_name='Скан СТС')
     vehicle_passport_scan = models.FileField(upload_to='vehicles/vehicle_passports/',
                                              null=True, blank=True, verbose_name='Скан ПТС')
-    status = models.BooleanField(null=False, blank=True, default=True, verbose_name='Статус')
+    status = models.ForeignKey(to='VehicleStatus', on_delete=models.PROTECT,
+                               null=True, blank=False, verbose_name='Статус')
+    location = models.ForeignKey(to='VehicleLocation', on_delete=models.PROTECT,
+                                 null=True, blank=False, verbose_name='Место базирования')
+    rent_type = models.CharField(max_length=1, choices=rent_type_choices, null=True, blank=False,
+                                 verbose_name='Способ использования')
 
     def rc_filename(self):
         return os.path.basename(self.registration_certificate_scan.name)
@@ -210,6 +218,29 @@ class Vehicle(models.Model):
     class Meta:
         verbose_name_plural = 'Автомобили'
         verbose_name = 'Автомобиль'
+
+
+class VehicleLocation(models.Model):
+    place = models.CharField(max_length=300, verbose_name='Место')
+
+    def __str__(self):
+        return self.place
+
+    class Meta:
+        verbose_name_plural = 'Локации автомобилей'
+        verbose_name = 'Локация автомобилей'
+
+
+class VehicleStatus(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Статус')
+    is_active = models.BooleanField(verbose_name='Активно')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = 'Статусы ТС'
+        verbose_name = 'Статус ТС'
 
 
 class RegistrationCertificateScan(models.Model):

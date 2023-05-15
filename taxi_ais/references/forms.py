@@ -2,7 +2,8 @@ from django import forms
 from .models import Driver, Vehicle, Rent, Contractor
 from django.utils import timezone
 
-class DriverForm(forms.Form):
+
+class CreateDriverForm(forms.Form):
     second_name = forms.CharField(max_length=50, required=False, label='Фамилия')
     first_name = forms.CharField(max_length=50, required=False, label='Имя')
     patronimic = forms.CharField(max_length=50, required=False, label='Отчество')
@@ -27,6 +28,7 @@ class DriverForm(forms.Form):
                                      widget=forms.FileInput(attrs={'multiple': 'multiple'}))
     contract_photo = forms.ImageField(required=False, label='Фото договора аренды',
                                       widget=forms.FileInput(attrs={'multiple': 'multiple'}))
+    comment = forms.CharField(widget=forms.TextInput(), label='Комментарий')
 
 
 class UpdateDriverForm(forms.ModelForm):
@@ -35,8 +37,7 @@ class UpdateDriverForm(forms.ModelForm):
         fields = ('second_name', 'first_name', 'patronimic', 'name', 'citizenship', 'passport_id',
                   'passport_issue_date', 'date_of_birth', 'place_of_birth', 'residence_place', 'phone_number',
                   'driving_license_id', 'driving_license_category', 'driving_license_validity_period', 'rent_sum',
-                  'deposit', 'status')
-        widgets = {'status': forms.Select(choices=((True, 'Активен'), (False, 'Неактивен')))}
+                  'deposit', 'status', 'comment')
 
 
 class CreateVehicleForm(forms.ModelForm):
@@ -45,7 +46,7 @@ class CreateVehicleForm(forms.ModelForm):
         fields = ('VIN', 'license_plate', 'registration_certificate_id', 'vehicle_passport_id', 'engine_id', 'color',
                   'leasing_contract_id', 'insurance_policy_series', 'insurance_policy_id', 'leasing_contract_date',
                   'lessor', 'vehicle_type', 'manufacture_year', 'registration_certificate_scan',
-                  'vehicle_passport_scan')
+                  'vehicle_passport_scan', 'status', 'location', 'rent_type')
         widgets = {'registration_certificate_scan': forms.FileInput(attrs={'accept': '.pdf'}),
                    'vehicle_passport_scan': forms.FileInput(attrs={'accept': '.pdf'})}
 
@@ -56,8 +57,7 @@ class UpdateVehicleForm(forms.ModelForm):
         fields = ('VIN', 'license_plate', 'registration_certificate_id', 'vehicle_passport_id', 'engine_id', 'color',
                   'leasing_contract_id', 'insurance_policy_series', 'insurance_policy_id', 'leasing_contract_date',
                   'lessor', 'vehicle_type', 'manufacture_year', 'registration_certificate_scan',
-                  'vehicle_passport_scan', 'status')
-        widgets = {'status': forms.Select(choices=((True, 'Активно'), (False, 'Неактивно')))}
+                  'vehicle_passport_scan', 'status', 'location', 'rent_type')
 
 
 class CreateRentPaymentForm(forms.ModelForm):

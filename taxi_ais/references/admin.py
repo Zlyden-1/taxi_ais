@@ -11,4 +11,5 @@ admin.site.register(models.VehicleType)
 admin.site.register(models.Contractor)
 admin.site.register(models.Client)
 admin.site.register(models.Expense)
-# Register your models here.
+admin.site.register(models.VehicleLocation)
+admin.site.register(models.VehicleStatus)

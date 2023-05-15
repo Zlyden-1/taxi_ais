@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from django.views.generic.edit import UpdateView, DeleteView, CreateView
 from django.utils import timezone
 
-from .forms import DriverForm, UpdateDriverForm, CreateVehicleForm, UpdateVehicleForm, CreateRentPaymentForm
+from .forms import CreateDriverForm, UpdateDriverForm, CreateVehicleForm, UpdateVehicleForm, CreateRentPaymentForm
 from .models import Contractor, Driver, Vehicle, DriverPassportPhoto, DriverPhoto, DrivingLicensePhoto, \
     RentingContractPhoto, Rent
 
@@ -99,11 +99,11 @@ def delete_contractor(request, pk):
 
 def drivers(request):
     if request.method == 'GET':
-        form = DriverForm()
+        form = CreateDriverForm()
         drivers = Driver.objects.all()
         return render(request, 'references/drivers.html', {'form': form, 'drivers': drivers})
     elif request.method == 'POST':
-        form = DriverForm(request.POST, request.FILES)
+        form = CreateDriverForm(request.POST, request.FILES)
         if form.is_valid():
             driver = Driver.objects.create(first_name=form.cleaned_data['first_name'],
                                            second_name=form.cleaned_data['second_name'],
@@ -122,6 +122,7 @@ def drivers(request):
                                                'driving_license_validity_period'],
                                            rent_sum=form.cleaned_data['rent_sum'],
                                            deposit=form.cleaned_data['deposit'],
+                                           comment=form.cleaned_data['comment'],
                                            status=True, )
             save_photos(driver, request, DriverPassportPhoto, 'passport_photo')
             save_photos(driver, request, DriverPhoto, 'photo')
@@ -135,11 +136,11 @@ def drivers(request):
 
 def active_drivers(request):
     if request.method == 'GET':
-        form = DriverForm()
+        form = CreateDriverForm()
         drivers = Driver.objects.filter(status=True)
         return render(request, 'references/active_drivers.html', {'form': form, 'drivers': drivers})
     elif request.method == 'POST':
-        form = DriverForm(request.POST, request.FILES)
+        form = CreateDriverForm(request.POST, request.FILES)
         if form.is_valid():
             driver = Driver.objects.create(first_name=form.cleaned_data['first_name'],
                                            second_name=form.cleaned_data['second_name'],
@@ -158,6 +159,7 @@ def active_drivers(request):
                                                'driving_license_validity_period'],
                                            rent_sum=form.cleaned_data['rent_sum'],
                                            deposit=form.cleaned_data['deposit'],
+                                           comment=form.cleaned_data['comment'],
                                            status=True, )
             save_photos(driver, request, DriverPassportPhoto, 'passport_photo')
             save_photos(driver, request, DriverPhoto, 'photo')
@@ -289,7 +291,8 @@ class Vehicles(CreateView):
                                          registration_certificate_scan=form.cleaned_data[
                                              'registration_certificate_scan'],
                                          vehicle_passport_scan=form.cleaned_data['vehicle_passport_scan'],
-                                         status=True)
+                                         status=form.cleaned_data['status'],
+                                         location=form.cleaned_data['location'])
         vehicle.save()
         return HttpResponseRedirect(redirect_to='/references/vehicles')
 
