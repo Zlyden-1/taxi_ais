@@ -13,6 +13,7 @@
     <input type="submit" name="submit" value="Сохранить"/>
 </form>
 <div>
+<button type="button"><a href="{% url 'contractors:rent_report_view' %}">Отчеты по аренде</a></button>
     <h2>Все операции по аренде</h2>
     {% if rent_list %}
     <table border="1">
@@ -21,6 +22,7 @@
             <td>Дата</td>
             <td>Сумма</td>
             <td>Баланс</td>
+            <td>Комментарий</td>
         </tr>
         {% for rent in rent_list %}
         <tr>
@@ -28,6 +30,7 @@
             <td>{{ rent.payment_date }}</td>
             <td>{{ rent.summ }}</td>
             <td>{{ rent.balance }}</td>
+            <td>{{ rent.comment }}</td>
         </tr>
         {% endfor %}
     </table>

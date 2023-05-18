@@ -31,4 +31,5 @@ urlpatterns = [
     path('references/vehicle/<str:pk>', views.VehicleDetail.as_view(), name='vehicle'),
     path('references/vehicle/<str:pk>/delete', views.VehicleDeleteView.as_view(), name='delete_vehicle'),
     path('references/rent_list/', views.RentList.as_view(), name='rent_list'),
+    path('references/rent_report', views.RentReportView.as_view(), name='rent_report_view'),
 ]

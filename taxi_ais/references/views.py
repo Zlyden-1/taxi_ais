@@ -2,12 +2,16 @@ from django.shortcuts import render, reverse, get_object_or_404
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.core.files.base import ContentFile
+from django.views.generic import TemplateView
 from django.views.generic.edit import UpdateView, DeleteView, CreateView
 from django.utils import timezone
 
-from .forms import CreateDriverForm, UpdateDriverForm, CreateVehicleForm, UpdateVehicleForm, CreateRentPaymentForm
-from .models import Contractor, Driver, Vehicle, DriverPassportPhoto, DriverPhoto, DrivingLicensePhoto, \
-    RentingContractPhoto, Rent
+from datetime import datetime, timedelta
+
+from .forms import (CreateDriverForm, UpdateDriverForm, CreateVehicleForm, UpdateVehicleForm, CreateRentPaymentForm,
+    DateRangeForm)
+from .models import (Contractor, Driver, Vehicle, DriverPassportPhoto, DriverPhoto, DrivingLicensePhoto,
+    RentingContractPhoto, Rent)
 
 
 def index(request):
@@ -55,23 +59,24 @@ def contractor_detail(request, pk):
 
 def add_contractor_rent(request, pk):
     contractor = get_object_or_404(Contractor, pk=pk)
-    payment_date = timezone.now()
+    payment_date = timezone.localdate()
+    time = timezone.localtime()
     try:
-        summ = request.POST['summ']
+        summ = int(request.POST['summ'])
     except KeyError:
         return render(request, 'references/error.html', {
             'error_message': "Вы не ввели сумму",
         })
     else:
         try:
-            previous_rent = Rent.objects.order_by('-payment_date').first()
+            previous_rent = Rent.objects.order_by('-payment_date', '-time').first()
             if previous_rent is None:
                 balance = summ
             else:
                 balance = previous_rent.balance + summ
         except Rent.DoesNotExist:
             balance = summ
-        rent = Rent(contractor=contractor, payment_date=payment_date, summ=summ, balance=balance)
+        rent = Rent(contractor=contractor, payment_date=payment_date, time=time, summ=summ, balance=balance)
         rent.save()
         return HttpResponseRedirect(redirect_to=f'/references/contractor/{contractor.pk}')
 
@@ -350,12 +355,12 @@ class RentList(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['rent_list'] = Rent.objects.order_by('-payment_date')
+        context['rent_list'] = Rent.objects.order_by('-payment_date', '-time')
         return context
 
     def form_valid(self, form):
         try:
-            previous_rent = Rent.objects.order_by('-payment_date').first()
+            previous_rent = Rent.objects.order_by('-payment_date', '-time').first()
             rent = form.save(commit=False)
             if previous_rent is None:
                 balance = rent.summ
@@ -365,5 +370,73 @@ class RentList(CreateView):
             rent = form.save(commit=False)
             balance = rent.summ
         rent.balance = balance
+        rent.time = timezone.localtime()
         rent.save()
         return HttpResponseRedirect(redirect_to='/references/rent_list')
+
+
+class RentReportView(TemplateView):
+    template_name = 'references/rent_report.html'
+
+    def get(self, request, *args, **kwargs):
+        # Определяем даты начала и конца периода по умолчанию
+        today = datetime.now().date()
+        last_week = today - timedelta(days=7)
+        start_date = request.GET.get('start_date', last_week)
+        end_date = request.GET.get('end_date', today)
+        rent_form = CreateRentPaymentForm()
+        date_range_form = DateRangeForm(initial={'start_date': start_date, 'end_date': end_date})
+
+        context = {
+            'rent_form': rent_form,
+            'date_range_form': date_range_form,
+        }
+        rents = Rent.objects.filter(
+            payment_date__range=[start_date, end_date]).order_by('payment_date', 'time')
+        context['dates'] = list({rent.payment_date for rent in rents})
+        context['dates'].sort()
+        contractors_ = {rent.contractor for rent in rents}
+        contractors_rents = {}
+        for contractor in contractors_:
+            contractors_rents[contractor] = []
+            contractor_rents = rents.filter(contractor=contractor).exclude(comment='Автоматическое начисление аренды')
+            for date in context['dates']:
+                current_payments = contractor_rents.filter(payment_date=date)
+                if current_payments:
+                    contractors_rents[contractor].append(sum([rent.summ for rent in current_payments]))
+                else:
+                    contractors_rents[contractor].append(0)
+            contractors_rents[contractor].append(sum(contractors_rents[contractor]))
+            contractors_rents[contractor].append(rents.filter(contractor=contractor).last().balance)
+        context['rents'] = contractors_rents
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        rent_form = CreateRentPaymentForm(request.POST)
+        if rent_form.is_valid():
+            try:
+                previous_rent = Rent.objects.order_by('-payment_date', '-time').first()
+                rent = rent_form.save(commit=False)
+                if previous_rent is None:
+                    balance = rent.summ
+                else:
+                    balance = previous_rent.balance + rent.summ
+            except Rent.DoesNotExist:
+                rent = rent_form.save(commit=False)
+                balance = rent.summ
+            rent.balance = balance
+            rent.time = timezone.localtime()
+            print(timezone.localtime())
+            rent.save()
+            return HttpResponseRedirect(reverse('contractors:rent_report_view'))
+
+        date_range_form = DateRangeForm(request.POST)
+        if date_range_form.is_valid():
+            start_date = date_range_form.cleaned_data['start_date']
+            end_date = date_range_form.cleaned_data['end_date']
+            return HttpResponseRedirect(
+                reverse('contractors:rent_report_view') + f'?start_date={start_date}&end_date={end_date}')
+
+        context = {'rent_form': rent_form, 'date_range_form': date_range_form}
+        return render(request, self.template_name, context)
+
