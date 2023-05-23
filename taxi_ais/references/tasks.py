@@ -18,7 +18,7 @@ def add_rent_task():
             balance = summ
         rent = Rent.objects.create(
             contractor=contractor,
-            date=timezone.localdate(),
+            payment_date=timezone.localdate(),
             time=timezone.localtime(),
             summ=summ,
             comment='Автоматическое начисление аренды'

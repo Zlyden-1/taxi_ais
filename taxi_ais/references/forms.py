@@ -28,7 +28,7 @@ class CreateDriverForm(forms.Form):
                                      widget=forms.FileInput(attrs={'multiple': 'multiple'}))
     contract_photo = forms.ImageField(required=False, label='Фото договора аренды',
                                       widget=forms.FileInput(attrs={'multiple': 'multiple'}))
-    comment = forms.CharField(widget=forms.TextInput(), label='Комментарий')
+    comment = forms.CharField(required=False, label='Комментарий', widget=forms.TextInput())
 
 
 class UpdateDriverForm(forms.ModelForm):
