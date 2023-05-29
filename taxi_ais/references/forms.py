@@ -62,7 +62,7 @@ class UpdateVehicleForm(forms.ModelForm):
 
 class CreateRentPaymentForm(forms.ModelForm):
     contractor = forms.ModelChoiceField(Contractor.objects.all(), label='Исполнитель')
-    payment_date = forms.DateField(widget=forms.DateInput(attrs={'readonly': True}), initial=timezone.localdate(),
+    payment_date = forms.DateField(widget=forms.DateInput(), initial=timezone.localdate(),
                                    label='Дата')
     summ = forms.IntegerField(label='Сумма')
 
