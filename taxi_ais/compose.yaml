@@ -29,6 +29,7 @@ services:
     image: m4vdoshin/taxi_ais:2
     volumes:
       - media:/taxi_ais/media
+      - /home/logs:/taxi_ais/debug.log
     command:
       python manage.py runserver 0.0.0.0:8000
     ports:

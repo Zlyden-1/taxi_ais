@@ -134,8 +134,29 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 CELERY_BROKER_URL = "amqp://rabbitmq:rabbitmq@rabbitmq:5672/"
 
 CELERY_TASK_TRACK_STARTED = True
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log'
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console', 'file']
+        }
+    }
+}
