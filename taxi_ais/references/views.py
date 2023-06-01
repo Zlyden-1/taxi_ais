@@ -395,19 +395,28 @@ class RentReportView(TemplateView):
             payment_date__range=[start_date, end_date]).order_by('payment_date', 'time')
         context['dates'] = list({rent.payment_date for rent in rents})
         context['dates'].sort()
-        contractors_ = {rent.contractor for rent in rents}
+        contractors_ = list({rent.contractor for rent in rents})
+        contractors_.sort(key=lambda contractor: contractor.driver.name)
         contractors_rents = {}
+        daily_total = [0] * len(context['dates'])
         for contractor in contractors_:
             contractors_rents[contractor] = []
             contractor_rents = rents.filter(contractor=contractor).exclude(comment='Автоматическое начисление аренды')
+            day_index = 0
             for date in context['dates']:
                 current_payments = contractor_rents.filter(payment_date=date)
                 if current_payments:
-                    contractors_rents[contractor].append(sum([rent.summ for rent in current_payments]))
+                    sum_ = sum([rent.summ for rent in current_payments])
                 else:
-                    contractors_rents[contractor].append(0)
+                    sum_ = 0
+                contractors_rents[contractor].append(sum_)
+                daily_total[day_index] += sum_
+                day_index += 1
             contractors_rents[contractor].append(sum(contractors_rents[contractor]))
             contractors_rents[contractor].append(rents.filter(contractor=contractor).last().balance)
+        daily_total.append(sum(daily_total))
+        daily_total.append('')
+        contractors_rents['Итого'] = daily_total
         context['rents'] = contractors_rents
         return render(request, self.template_name, context)
 
