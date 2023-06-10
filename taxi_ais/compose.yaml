@@ -26,10 +26,10 @@ services:
       - database:/var/lib/postgresql/data
 
   web:
-    image: m4vdoshin/taxi_ais:2
+    image: m4vdoshin/taxi_ais:test
     volumes:
       - media:/taxi_ais/media
-      - /home/logs:/taxi_ais/debug.log
+      # - /home/logs:/taxi_ais/debug.log
     command:
       python manage.py runserver 0.0.0.0:8000
     ports:
@@ -40,7 +40,7 @@ services:
       - db
 
   celery-worker:
-    image: m4vdoshin/taxi_ais:2
+    image: m4vdoshin/taxi_ais:test
     volumes:
       - media:/taxi_ais/media
     command:
@@ -53,7 +53,7 @@ services:
       - rabbitmq
 
   celery-beat:
-    image: m4vdoshin/taxi_ais:2
+    image: m4vdoshin/taxi_ais:test
     volumes:
       - media:/taxi_ais/media
     command:

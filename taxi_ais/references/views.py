@@ -360,8 +360,8 @@ class RentList(CreateView):
 
     def form_valid(self, form):
         try:
-            previous_rent = Rent.objects.order_by('-payment_date', '-time').first()
             rent = form.save(commit=False)
+            previous_rent = Rent.objects.filter(contractor_id=rent.contractor.id).order_by('-payment_date', '-time').first()
             if previous_rent is None:
                 balance = rent.summ
             else:
@@ -422,20 +422,18 @@ class RentReportView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         rent_form = CreateRentPaymentForm(request.POST)
+        rent = rent_form.save(commit=False)
         if rent_form.is_valid():
             try:
-                previous_rent = Rent.objects.order_by('-payment_date', '-time').first()
-                rent = rent_form.save(commit=False)
+                previous_rent = Rent.objects.filter(contractor_id=rent.contractor.id).order_by('-payment_date', '-time').first()
                 if previous_rent is None:
                     balance = rent.summ
                 else:
                     balance = previous_rent.balance + rent.summ
             except Rent.DoesNotExist:
-                rent = rent_form.save(commit=False)
                 balance = rent.summ
             rent.balance = balance
             rent.time = timezone.localtime()
-            print(timezone.localtime())
             rent.save()
             return HttpResponseRedirect(reverse('contractors:rent_report_view'))
 

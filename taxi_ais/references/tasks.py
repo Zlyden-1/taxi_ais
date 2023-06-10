@@ -9,7 +9,7 @@ def add_rent_task():
     for contractor in contractors:
         summ = -contractor.vehicle.vehicle_type.rent_price
         try:
-            previous_rent = Rent.objects.order_by('-payment_date', '-time').first()
+            previous_rent = Rent.objects.filter(contractor=contractor).order_by('-payment_date', '-time').first()
             if previous_rent is None:
                 balance = summ
             else:
