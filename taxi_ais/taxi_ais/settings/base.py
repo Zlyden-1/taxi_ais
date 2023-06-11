@@ -15,7 +15,7 @@ from pathlib import Path
 from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
@@ -26,12 +26,6 @@ MEDIA_URL = '/media/'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-ob$1w(igs!$l&t=01b6a1og-4r4ub4glp^%=9te7!qhrv+9fx)'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['80.78.244.52', '80-78-244-52.cloudvps.regruhosting.ru', '127.0.0.1']
-
 
 # Application definition
 
@@ -75,21 +69,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'taxi_ais.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'taxi_ais',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'db',
-        'PORT': '',
-    }
-}
 
 
 # Password validation
@@ -140,23 +119,3 @@ CELERY_BROKER_URL = "amqp://rabbitmq:rabbitmq@rabbitmq:5672/"
 CELERY_TASK_TRACK_STARTED = True
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log'
-        }
-    },
-    'loggers': {
-        '': {
-            'handlers': ['console', 'file']
-        }
-    }
-}

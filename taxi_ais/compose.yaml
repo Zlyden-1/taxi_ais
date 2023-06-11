@@ -25,15 +25,26 @@ services:
     volumes:
       - database:/var/lib/postgresql/data
 
+  nginx:
+    image: nginx
+    restart: always
+    volumes:
+      - ./config/nginx:/etc/nginx/templates
+      - .:/taxi_ais
+    ports:
+      - "80:80"
+
   web:
     image: m4vdoshin/taxi_ais:test
     volumes:
       - media:/taxi_ais/media
       # - /home/logs:/taxi_ais/debug.log
-    command:
-      python manage.py runserver 0.0.0.0:8000
-    ports:
-      - "8000:8000"
+      - .:/taxi_ais
+    command: uwsgi --ini /taxi_ais/config/uwsgi/uwsgi.ini
+    # ports:
+    #   - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=taxi_ais.settings.prod
     depends_on:
       - db
     links:
@@ -45,6 +56,8 @@ services:
       - media:/taxi_ais/media
     command:
       celery -A taxi_ais worker -l INFO
+    environment:
+      - DJANGO_SETTINGS_MODULE=taxi_ais.settings.prod
     depends_on:
       - db
       - rabbitmq
@@ -58,6 +71,8 @@ services:
       - media:/taxi_ais/media
     command:
       celery -A taxi_ais beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      - DJANGO_SETTINGS_MODULE=taxi_ais.settings.prod
     depends_on:
       - db
       - rabbitmq
