@@ -31,13 +31,14 @@ services:
     volumes:
       - ./config/nginx:/etc/nginx/templates
       - .:/taxi_ais
+      # - media:/taxi_ais/media
     ports:
       - "80:80"
 
   web:
     image: m4vdoshin/taxi_ais:test
     volumes:
-      - media:/taxi_ais/media
+      # - media:/taxi_ais/media
       # - /home/logs:/taxi_ais/debug.log
       - .:/taxi_ais
     command: uwsgi --ini /taxi_ais/config/uwsgi/uwsgi.ini
@@ -53,7 +54,7 @@ services:
   celery-worker:
     image: m4vdoshin/taxi_ais:test
     volumes:
-      - media:/taxi_ais/media
+      - .:/taxi_ais
     command:
       celery -A taxi_ais worker -l INFO
     environment:
@@ -68,7 +69,7 @@ services:
   celery-beat:
     image: m4vdoshin/taxi_ais:test
     volumes:
-      - media:/taxi_ais/media
+      - .:/taxi_ais
     command:
       celery -A taxi_ais beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
     environment:
@@ -85,4 +86,3 @@ volumes:
     driver: local
   database:
     driver: local
-  media:
