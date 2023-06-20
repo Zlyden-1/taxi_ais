@@ -113,9 +113,9 @@ class DriverPhoto(models.Model):
         return os.path.basename(self.photo.name)
 
     def delete(self, *args, **kwargs):
-        print(self.photo.path)
         photo_path = self.photo.path
-        os.remove(photo_path)
+        if os.path.exists(photo_path):
+            os.remove(photo_path)        
         super().delete(*args, **kwargs)
 
 
@@ -127,8 +127,8 @@ class DrivingLicensePhoto(models.Model):
         return os.path.basename(self.photo.name)
 
     def delete(self, *args, **kwargs):
-        photo_path = self.photo.path
-        os.remove(photo_path)
+        if os.path.exists(photo_path):
+            os.remove(photo_path) 
         super().delete(*args, **kwargs)
 
 
@@ -140,8 +140,8 @@ class DriverPassportPhoto(models.Model):
         return os.path.basename(self.photo.name)
 
     def delete(self, *args, **kwargs):
-        photo_path = self.photo.path
-        os.remove(photo_path)
+        if os.path.exists(photo_path):
+            os.remove(photo_path) 
         super().delete(*args, **kwargs)
 
 
@@ -153,8 +153,8 @@ class RentingContractPhoto(models.Model):
         return os.path.basename(self.photo.name)
 
     def delete(self, *args, **kwargs):
-        photo_path = self.photo.path
-        os.remove(photo_path)
+        if os.path.exists(photo_path):
+            os.remove(photo_path) 
         super().delete(*args, **kwargs)
 
 
@@ -260,8 +260,8 @@ class RegistrationCertificateScan(models.Model):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        photo_path = self.photo.path
-        os.remove(photo_path)
+        if os.path.exists(photo_path):
+            os.remove(photo_path) 
         super().delete(*args, **kwargs)
 
 
@@ -282,8 +282,8 @@ class VehiclePassportScan(models.Model):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        photo_path = self.photo.path
-        os.remove(photo_path)
+        if os.path.exists(photo_path):
+            os.remove(photo_path) 
         super().delete(*args, **kwargs)
 
 

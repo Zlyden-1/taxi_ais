@@ -5,4 +5,4 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /taxi_ais
 COPY .. /taxi_ais
 RUN pip install --no-cache-dir -r requirements.txt
-# RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput --settings=taxi_ais.settings.prod

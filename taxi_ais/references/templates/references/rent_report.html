@@ -22,6 +22,9 @@
     <thead>
     <tr>
         <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
         {% for date in dates %}
             <th>{{ date }}</th>
         {% endfor %}
@@ -32,7 +35,10 @@
     <tbody>
     {% for contractor, sums in rents.items %}
         <tr>
+            <th>{% if not forloop.last %}{{ forloop.counter }}{% endif %}</th>
             <th>{{ contractor }}</th>
+            <th>{{ contractor.vehicle.location }}</th>
+            <th>{{ contractor.vehicle.get_rent_type_display }}</th>
             {% for summ in sums %}
                 <td> {{ summ }} </td>
             {% endfor %}

@@ -13,7 +13,6 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq:/var/lib/rabbitmq
-      - ./conf/:/etc/rabbitmq/
 
   db:
     image: postgres
@@ -26,23 +25,23 @@ services:
       - database:/var/lib/postgresql/data
 
   nginx:
-    image: nginx
+    image: m4vdoshin/taxi_ais:nginx
     restart: always
+    depends_on:
+      - web
     volumes:
-      - ./config/nginx:/etc/nginx/templates
-      - .:/taxi_ais
+      # - ./config/nginx:/etc/nginx/templates
+      - media:/taxi_ais/media
+      - sockets:/taxi_ais/sockets
     ports:
       - "80:80"
 
   web:
-    image: m4vdoshin/taxi_ais:test
+    image: m4vdoshin/taxi_ais:2.1
     volumes:
       - media:/taxi_ais/media
-      # - /home/logs:/taxi_ais/debug.log
-      - .:/taxi_ais
+      - sockets:/taxi_ais/sockets
     command: uwsgi --ini /taxi_ais/config/uwsgi/uwsgi.ini
-    # ports:
-    #   - "8000:8000"
     environment:
       - DJANGO_SETTINGS_MODULE=taxi_ais.settings.prod
     depends_on:
@@ -51,7 +50,7 @@ services:
       - db
 
   celery-worker:
-    image: m4vdoshin/taxi_ais:test
+    image: m4vdoshin/taxi_ais:2.1
     volumes:
       - media:/taxi_ais/media
     command:
@@ -66,7 +65,7 @@ services:
       - rabbitmq
 
   celery-beat:
-    image: m4vdoshin/taxi_ais:test
+    image: m4vdoshin/taxi_ais:2.1
     volumes:
       - media:/taxi_ais/media
     command:
@@ -86,3 +85,6 @@ volumes:
   database:
     driver: local
   media:
+    driver: local
+  sockets:
+    driver: local
