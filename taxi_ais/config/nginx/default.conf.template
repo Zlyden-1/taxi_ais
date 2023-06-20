@@ -1,5 +1,5 @@
 upstream uwsgi_app {
-    server unix:/taxi_ais/uwsgi_app.sock;
+    server unix:/taxi_ais/sockets/uwsgi_app.sock;
 }
 server {
     listen 80;
