@@ -4,29 +4,11 @@ from django.db import models
 from django.conf import settings
 
 
-class Order(models.Model):
-    ID = models.IntegerField(primary_key=True, null=False, blank=False)
-    client = models.ForeignKey(to='Client', on_delete=models.PROTECT,
-                               null=False, blank=False, verbose_name='ИНН заказчика')
-    contractor = models.ForeignKey(to='Contractor', on_delete=models.PROTECT,
-                                   null=False, blank=False, verbose_name='Исполнитель')
-    order_time = models.DateTimeField(null=False, blank=False, verbose_name='Время заказа')
-    execution_time = models.DateTimeField(null=False, blank=False, db_index=True, verbose_name='Время исполнения')
-    summ = models.IntegerField(null=False, blank=False, verbose_name='Сумма')
-    milage = models.FloatField(null=False, blank=False, verbose_name='Километраж')
-
-    def __str__(self):
-        return self.ID
-
-    class Meta:
-        verbose_name_plural = 'Заказы'
-        verbose_name = 'Заказ'
-        ordering = ['execution_time']
-
-
 class Client(models.Model):
-    taxpayer_id = models.CharField(primary_key=True, max_length=20, null=False, blank=False, verbose_name='ИНН')
-    registration_cause_code = models.CharField(max_length=20, null=False, blank=False, verbose_name='КПП')
+    taxpayer_id = models.CharField(primary_key=True, max_length=20, 
+                                   null=False, blank=False, verbose_name='ИНН')
+    registration_cause_code = models.CharField(max_length=20, null=False, blank=False, 
+                                               verbose_name='КПП')
     main_state_registration_number = models.CharField(max_length=20, null=False, blank=False, verbose_name='ОГРН')
     business_activity_code = models.CharField(max_length=20, null=False, blank=False, verbose_name='ОКВЭД')
     organisation = models.CharField(max_length=150, db_index=True,
@@ -49,15 +31,19 @@ class Client(models.Model):
         ordering = ['organisation']
 
 
-class Contractor(models.Model):
-    driver = models.ForeignKey(to='Driver', on_delete=models.PROTECT,
-                               null=False, blank=False, verbose_name='ID водителя')
-    vehicle = models.ForeignKey(to='Vehicle', on_delete=models.PROTECT,
-                                null=False, blank=False, verbose_name='ID машины')
-    renting_date = models.DateField(null=False, blank=False, db_index=True, verbose_name='Дата аренды')
+class VehicleHistory(models.Model):
+    driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE,
+                               null=False, blank=False, verbose_name='Водитель')
+    vehicle = models.ForeignKey(to='Vehicle', on_delete=models.CASCADE,
+                                null=False, blank=False, verbose_name='ТС')
+    renting_date = models.DateField(null=False, blank=False, verbose_name='Дата взятия в аренду')
+    renting_end_date = models.DateField(null=True, blank=True, verbose_name='Дата сдачи')
 
     def __str__(self):
-        return f'{self.driver} {self.vehicle}'
+        if self.renting_end_date:
+            return f'{self.driver} {self.vehicle} с {self.renting_date} по {self.renting_end_date}'
+        else:
+            return f'{self.driver} {self.vehicle} с {self.renting_date} по сегодня'
 
     class Meta:
         verbose_name_plural = 'Исполнители'
@@ -83,6 +69,7 @@ class Driver(models.Model):
     deposit = models.IntegerField(null=True, blank=True, verbose_name='Залог')
     status = models.BooleanField(null=False, blank=True, default=True, verbose_name='Статус')
     comment = models.TextField(null=True, blank=True, verbose_name='Комментарий')
+    telegram_id = models.CharField(max_length=33, verbose_name='Тег в телеграм')
 
     def delete(self, *args, **kwargs):
         for photo in self.driverphoto_set.all():
@@ -105,10 +92,13 @@ class Driver(models.Model):
         verbose_name = 'Водитель'
 
 
-class DriverPhoto(models.Model):
-    photo = models.ImageField(upload_to='drivers/photos/', verbose_name='Фото водителя')
+class AbstractDriverPhoto(models.Model):
+    photo = models.ImageField(upload_to=...)
     driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE, verbose_name='Водитель')
 
+    def __str__(self):
+        return self.name
+    
     def filename(self):
         return os.path.basename(self.photo.name)
 
@@ -118,44 +108,24 @@ class DriverPhoto(models.Model):
             os.remove(photo_path)        
         super().delete(*args, **kwargs)
 
+    class Meta:
+        abstract = True
 
-class DrivingLicensePhoto(models.Model):
+
+class DriverPhoto(AbstractDriverPhoto):
+    photo = models.ImageField(upload_to='drivers/photos/', verbose_name='Фото водителя')
+
+
+class DrivingLicensePhoto(AbstractDriverPhoto):
     photo = models.ImageField(upload_to='drivers/driving_license_photos/', verbose_name='Фото прав')
-    driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE, verbose_name='Водитель')
-
-    def filename(self):
-        return os.path.basename(self.photo.name)
-
-    def delete(self, *args, **kwargs):
-        if os.path.exists(photo_path):
-            os.remove(photo_path) 
-        super().delete(*args, **kwargs)
 
 
-class DriverPassportPhoto(models.Model):
+class DriverPassportPhoto(AbstractDriverPhoto):
     photo = models.ImageField(upload_to='drivers/passports/', verbose_name='Фото паспорта')
-    driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE, verbose_name='Водитель')
-
-    def filename(self):
-        return os.path.basename(self.photo.name)
-
-    def delete(self, *args, **kwargs):
-        if os.path.exists(photo_path):
-            os.remove(photo_path) 
-        super().delete(*args, **kwargs)
 
 
-class RentingContractPhoto(models.Model):
+class RentingContractPhoto(AbstractDriverPhoto):
     photo = models.ImageField(upload_to='drivers/renting_contracts/', verbose_name='Фото договора аренды')
-    driver = models.ForeignKey(to='Driver', on_delete=models.CASCADE, verbose_name='Водитель')
-
-    def filename(self):
-        return os.path.basename(self.photo.name)
-
-    def delete(self, *args, **kwargs):
-        if os.path.exists(photo_path):
-            os.remove(photo_path) 
-        super().delete(*args, **kwargs)
 
 
 class Vehicle(models.Model):
@@ -185,6 +155,10 @@ class Vehicle(models.Model):
                                  null=True, blank=False, verbose_name='Место базирования')
     rent_type = models.CharField(max_length=1, choices=rent_type_choices, null=True, blank=False,
                                  verbose_name='Способ использования')
+    driver = models.OneToOneField(to=Driver, on_delete=models.SET_NULL, related_name='vehicle',
+                                  null=True, blank=True, verbose_name="Водитель")
+    usage_history = models.ManyToManyField(to=Driver, through=VehicleHistory, related_name='vehicles_history',
+                                           verbose_name="История использования")
 
     def rc_filename(self):
         return os.path.basename(self.registration_certificate_scan.name)
@@ -204,11 +178,11 @@ class Vehicle(models.Model):
     def delete(self, *args, **kwargs):
         if self.registration_certificate_scan:
             rc_path = os.path.join(settings.MEDIA_ROOT,
-                                   f'vehicles\\registration_certificates\\{self.registration_certificate_scan.name}')
+                                   f'vehicles/registration_certificates/{self.registration_certificate_scan.name}')
             os.remove(rc_path)
         if self.vehicle_passport_scan:
             vp_path = os.path.join(settings.MEDIA_ROOT,
-                                   f'vehicles\\vehicle_passports\\{self.vehicle_passport_scan.name}')
+                                   f'vehicles/vehicle_passports/{self.vehicle_passport_scan.name}')
             os.remove(vp_path)
         super().delete(*args, **kwargs)
 
@@ -243,50 +217,6 @@ class VehicleStatus(models.Model):
         verbose_name = 'Статус ТС'
 
 
-class RegistrationCertificateScan(models.Model):
-    photo = models.ImageField(upload_to='vehicles/Сканы_СТС', verbose_name='Скан СТС')
-    vehicle = models.ForeignKey(to='Vehicle', on_delete=models.CASCADE, verbose_name='ТС')
-
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            this_vehicle_photos = RegistrationCertificateScan.objects.filter(vehicle=self.vehicle)
-            self.photo.name = f'{self.vehicle}_скан_СТС_{len(this_vehicle_photos) + 1}.jpg'
-        else:
-            existing_photo = RegistrationCertificateScan.objects.get(pk=self.pk)
-            photo_path = existing_photo.photo.path
-            postfix = photo_path.split('_')[-1]
-            os.remove(photo_path)
-            self.photo.name = f'{self.vehicle}_скан_СТС_{postfix}'
-        super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        if os.path.exists(photo_path):
-            os.remove(photo_path) 
-        super().delete(*args, **kwargs)
-
-
-class VehiclePassportScan(models.Model):
-    photo = models.ImageField(upload_to='vehicles/Сканы_ПТС', verbose_name='Скан ПТС')
-    vehicle = models.ForeignKey(to='Vehicle', on_delete=models.CASCADE, verbose_name='ТС')
-
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            this_vehicle_photos = VehiclePassportScan.objects.filter(vehicle=self.vehicle)
-            self.photo.name = f'{self.vehicle}_скан_ПТС_{len(this_vehicle_photos) + 1}.jpg'
-        else:
-            existing_photo = VehiclePassportScan.objects.get(pk=self.pk)
-            photo_path = existing_photo.photo.path
-            postfix = photo_path.split('_')[-1]
-            os.remove(photo_path)
-            self.photo.name = f'{self.vehicle}_скан_ПТС_{postfix}'
-        super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        if os.path.exists(photo_path):
-            os.remove(photo_path) 
-        super().delete(*args, **kwargs)
-
-
 class VehicleType(models.Model):
     brand = models.CharField(max_length=20, null=False, blank=False, verbose_name='Марка ТС')
     model = models.CharField(max_length=40, null=False, blank=False, verbose_name='Модель ТС')
@@ -303,73 +233,3 @@ class VehicleType(models.Model):
         verbose_name_plural = 'Типы ТС'
         verbose_name = 'Тип ТС'
 
-
-class Rent(models.Model):
-    contractor = models.ForeignKey(to='Contractor', on_delete=models.PROTECT,
-                                   null=True, blank=False, verbose_name='Исполнитель')
-    payment_date = models.DateField(null=False, blank=False, verbose_name='Дата')
-    time = models.TimeField(null=True, blank=False, verbose_name='Время')
-    summ = models.FloatField(null=False, blank=False, verbose_name='Сумма')
-    balance = models.FloatField(null=True, blank=False, verbose_name='Баланс')
-    comment = models.TextField(null=True, blank=True, verbose_name='Комментарий')
-
-    def __str__(self):
-        return f'{self.contractor} {self.payment_date}'
-
-    class Meta:
-        verbose_name_plural = 'Аренда'
-        verbose_name = 'Аренда'
-
-
-class CarAccident(models.Model):
-    date = models.DateField(null=False, blank=False, verbose_name='Дата ДТП')
-    contractor = models.ForeignKey(to='Contractor', on_delete=models.PROTECT,
-                                   null=True, blank=False, verbose_name='Исполнитель')
-    status = models.ForeignKey(to='AccidentStatus', on_delete=models.PROTECT,
-                               null=False, blank=False, verbose_name='Статус')
-    photo = models.CharField(max_length=200, null=False, blank=False, verbose_name='Фото')
-
-    def __str__(self):
-        return f'{self.contractor} {self.date}'
-
-    class Meta:
-        verbose_name_plural = 'ДТП'
-        verbose_name = 'ДТП'
-
-
-class Expense(models.Model):
-    date = models.DateField(null=False, blank=False, verbose_name='Дата')
-    vehicle = models.ForeignKey(to='Vehicle', on_delete=models.PROTECT,
-                                null=False, blank=False, verbose_name='ID машины')
-    status = models.ForeignKey(to='ExpenseStatus', on_delete=models.PROTECT,
-                               null=False, blank=False, verbose_name='Статус')
-    summ = models.FloatField(null=False, blank=False, verbose_name='Сумма')
-
-    def __str__(self):
-        return f'{self.vehicle} {self.date}'
-
-    class Meta:
-        verbose_name_plural = 'Затраты'
-        verbose_name = 'Затрата'
-
-
-class AccidentStatus(models.Model):
-    status = models.CharField(max_length=40, primary_key=True, null=False, blank=False, verbose_name='Статус')
-
-    def __str__(self):
-        return self.status
-
-    class Meta:
-        verbose_name_plural = 'Статусы ДТП'
-        verbose_name = 'Статус ДТП'
-
-
-class ExpenseStatus(models.Model):
-    status = models.CharField(max_length=40, primary_key=True, null=False, blank=False, verbose_name='Статус')
-
-    def __str__(self):
-        return self.status
-
-    class Meta:
-        verbose_name_plural = 'Статусы затрат'
-        verbose_name = 'Статус затраты'

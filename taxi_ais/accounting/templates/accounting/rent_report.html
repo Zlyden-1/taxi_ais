@@ -16,7 +16,7 @@
     {{ date_range_form.as_p }}
     <button type="submit">Показать</button>
 </form>
-<button type="button"><a href="{% url 'contractors:rent_list' %}">Все записи по аренде</a></button>
+<button type="button"><a href="{% url 'accounting:rent_list' %}">Все записи по аренде</a></button>
 <h1>Выплаты по аренде за {{ dates.0 }} - {{ dates|last }}</h1>
 <table border="1">
     <thead>
@@ -33,12 +33,12 @@
     </tr>
     </thead>
     <tbody>
-    {% for contractor, sums in rents.items %}
+    {% for driver, sums in rents.items %}
         <tr>
             <th>{% if not forloop.last %}{{ forloop.counter }}{% endif %}</th>
-            <th>{{ contractor }}</th>
-            <th>{{ contractor.vehicle.location }}</th>
-            <th>{{ contractor.vehicle.get_rent_type_display }}</th>
+            <th>{{ driver }}</th>
+            <th>{{ driver.vehicle.location }}</th>
+            <th>{{ driver.vehicle.get_rent_type_display }}</th>
             {% for summ in sums %}
                 <td> {{ summ }} </td>
             {% endfor %}

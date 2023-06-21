@@ -7,13 +7,13 @@
 <body>
 <h1>Аренда</h1>
 <h2>Добавить выплату по аренде</h2>
-<form id="post_form" method="post" action="" enctype="multipart/form-data">
+<form id="post_form" method="post" action="">
     {% csrf_token %}
     {{ form.as_div }}
     <input type="submit" name="submit" value="Сохранить"/>
 </form>
 <div>
-<button type="button"><a href="{% url 'contractors:rent_report_view' %}">Отчеты по аренде</a></button>
+<button type="button"><a href="{% url 'accounting:rent_report' %}">Отчеты по аренде</a></button>
     <h2>Все операции по аренде</h2>
     {% if rent_list %}
     <table border="1">
@@ -26,7 +26,7 @@
         </tr>
         {% for rent in rent_list %}
         <tr>
-            <td>{{ rent.contractor }}</td>
+            <td>{{ rent.driver }}</td>
             <td>{{ rent.payment_date }}</td>
             <td>{{ rent.summ }}</td>
             <td>{{ rent.balance }}</td>
