@@ -54,7 +54,7 @@ class Driver(models.Model):
     second_name = models.CharField(max_length=50, null=True, blank=True, verbose_name='Фамилия')
     first_name = models.CharField(max_length=50, null=True, blank=True, verbose_name='Имя')
     patronimic = models.CharField(max_length=50, null=True, blank=True, verbose_name='Отчество')
-    name = models.CharField(max_length=50, null=True, blank=True, verbose_name='ФИО')
+    name = models.CharField(max_length=50, verbose_name='ФИО')
     citizenship = models.CharField(max_length=50, null=True, blank=True, verbose_name='Гражданство')
     passport_id = models.CharField(max_length=200, null=True, blank=True, verbose_name='Номер паспорта')
     passport_issue_date = models.DateField(null=True, blank=True, verbose_name='Дата выдачи паспорта')
@@ -69,7 +69,7 @@ class Driver(models.Model):
     deposit = models.IntegerField(null=True, blank=True, verbose_name='Залог')
     status = models.BooleanField(null=False, blank=True, default=True, verbose_name='Статус')
     comment = models.TextField(null=True, blank=True, verbose_name='Комментарий')
-    telegram_id = models.CharField(max_length=33, verbose_name='Тег в телеграм')
+    telegram_id = models.CharField(max_length=33, null=True, blank=True, verbose_name='Тег в телеграм')
 
     def delete(self, *args, **kwargs):
         for photo in self.driverphoto_set.all():
@@ -131,7 +131,7 @@ class RentingContractPhoto(AbstractDriverPhoto):
 class Vehicle(models.Model):
     rent_type_choices = [('А', 'Аренда'), ('В', 'Выкуп')]  # А и В здесь - русские буквы
 
-    VIN = models.CharField(max_length=50, primary_key=True, null=False, blank=False)
+    VIN = models.CharField(max_length=50, primary_key=True, null=False, blank=False, unique = True)
     license_plate = models.CharField(max_length=10, null=True, blank=True, verbose_name='Гос. номер')
     registration_certificate_id = models.CharField(max_length=100, null=True, blank=True, verbose_name='№ СТС')
     vehicle_passport_id = models.CharField(max_length=100, null=True, blank=True, verbose_name='№ ПТС')
