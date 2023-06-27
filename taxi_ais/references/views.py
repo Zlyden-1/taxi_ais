@@ -87,11 +87,11 @@ def active_drivers(request):
             return render(request, 'references/active_drivers.html', {'form': form, 'drivers': drivers})
 
 
-def save_photos(driver, request, photo_instance, key):
+def save_photos(driver, request, photo_class, key):
     for f in request.FILES.getlist(key):
         data = f.read()
-        photo = photo_instance(driver=driver)
-        objects = photo_instance.objects.filter(driver=driver)
+        photo = photo_class(driver=driver)
+        objects = photo_class.objects.filter(driver=driver)
         if objects:
             number = max([int(object_.filename().split('_')[-1].split('.')[0]) for object_ in objects]) + 1
         else:

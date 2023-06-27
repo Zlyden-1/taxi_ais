@@ -159,12 +159,16 @@ class Vehicle(models.Model):
                                   null=True, blank=True, verbose_name="Водитель")
     usage_history = models.ManyToManyField(to=Driver, through=VehicleHistory, related_name='vehicles_history',
                                            verbose_name="История использования")
+    acceptance_certificate_scan = models.FileField(upload_to='vehicles/acceptance_certificates/', 
+                                                   null=True, blank=True, verbose_name='Акт приема-передачи')
+    leasing_contract_scan = models.FileField(upload_to='vehicles/leasing_contracts/', 
+                                             null=True, blank=True, verbose_name='Договор лизинга')
 
-    def rc_filename(self):
-        return os.path.basename(self.registration_certificate_scan.name)
+    def filename(self, file_field):
+        return os.path.basename(self.file_field.name)
 
     def vp_filename(self):
-        return os.path.basename(self.vehicle_passport_scan.name)
+        return os.path.basename(self.file_field.name)
 
     def save(self, *args, **kwargs):
         if self.registration_certificate_scan:
