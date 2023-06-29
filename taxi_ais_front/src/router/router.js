@@ -10,11 +10,11 @@ const routes = [
         component: MainPage
     },
     {
-        path: '/refernces/drivers',
+        path: '/references/drivers',
         component: DriverList
     },
     {
-        path: '/refernces/vehicles',
+        path: '/references/vehicles',
         component: VehicleList
     },
     {
