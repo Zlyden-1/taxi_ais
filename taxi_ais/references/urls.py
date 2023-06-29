@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, api_views
 
 app_name = 'references'
 urlpatterns = [
@@ -23,4 +23,5 @@ urlpatterns = [
     path('vehicles/active', views.ActiveVehicles.as_view(), name='active_vehicles'),
     path('vehicle/<str:pk>', views.VehicleDetail.as_view(), name='vehicle'),
     path('vehicle/<str:pk>/delete', views.VehicleDeleteView.as_view(), name='delete_vehicle'),
+    path('api/drivers/', api_views.DriversListAPI.as_view(), name='api_drivers'),
 ]

@@ -37,7 +37,7 @@ services:
       - "80:80"
 
   web:
-    image: m4vdoshin/taxi_ais:2.1
+    image: m4vdoshin/taxi_ais:test
     volumes:
       - media:/taxi_ais/media
       - sockets:/taxi_ais/sockets

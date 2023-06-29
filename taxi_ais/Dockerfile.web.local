@@ -1,0 +1,11 @@
+FROM python:3.10-slim-buster
+RUN apt-get update && apt-get install -y gcc libpq-dev
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=taxi_ais.settings.local
+WORKDIR /taxi_ais
+COPY .. /taxi_ais
+RUN pip install --no-cache-dir -r requirements.txt
+RUN python manage.py collectstatic --noinput --settings=taxi_ais.settings.local
+CMD ["python", "manage.py", "runserver"]
+EXPOSE 8000

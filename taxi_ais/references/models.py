@@ -65,7 +65,6 @@ class Driver(models.Model):
     driving_license_id = models.CharField(max_length=20, null=True, blank=True, verbose_name='Номер прав')
     driving_license_category = models.CharField(max_length=30, null=True, blank=True, verbose_name='Категория')
     driving_license_validity_period = models.DateField(null=True, blank=True, verbose_name='Срок действия')
-    rent_sum = models.IntegerField(null=True, blank=True, verbose_name='Аренда')
     deposit = models.IntegerField(null=True, blank=True, verbose_name='Залог')
     status = models.BooleanField(null=False, blank=True, default=True, verbose_name='Статус')
     comment = models.TextField(null=True, blank=True, verbose_name='Комментарий')
