@@ -1,6 +1,7 @@
 from django import forms
-from .models import Driver, Vehicle, Rent, Contractor
 from django.utils import timezone
+
+from .models import Driver, Vehicle
 
 
 class CreateDriverForm(forms.Form):
@@ -59,18 +60,3 @@ class UpdateVehicleForm(forms.ModelForm):
                   'lessor', 'vehicle_type', 'manufacture_year', 'registration_certificate_scan',
                   'vehicle_passport_scan', 'status', 'location', 'rent_type')
 
-
-class CreateRentPaymentForm(forms.ModelForm):
-    contractor = forms.ModelChoiceField(Contractor.objects.all(), label='Исполнитель')
-    payment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=timezone.localdate(),
-                                   label='Дата')
-    summ = forms.IntegerField(label='Сумма')
-
-    class Meta:
-        fields = ('contractor', 'payment_date', 'summ', 'comment')
-        model = Rent
-
-
-class DateRangeForm(forms.Form):
-    start_date = forms.DateField(required=True, label='Начальная дата', widget=forms.DateInput(attrs={'type': 'date'}))
-    end_date = forms.DateField(required=True, label='Конечная дата', widget=forms.DateInput(attrs={'type': 'date'}))

@@ -17,11 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import render
+
+
+def index(request):
+    return render(request, 'references/index.html')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('references.urls', namespace='references'))
+    path('', index, name='index'),
+    path('references/', include('references.urls', namespace='references')),
+    path("accounting/", include('accounting.urls', namespace='accounting'))
 ]
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

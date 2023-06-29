@@ -23,14 +23,14 @@
 <p>Скан СТС:
     {% if object.registration_certificate_scan %}
     <a href="{{ object.registration_certificate_scan.url }}"
-                download="{{ object.registration_certificate_scan.name }}">{{ object.rc_filename }}</a></p>
+                download="{{ object.registration_certificate_scan.name }}">{{ object.filename:object.registration_certificate_scan }}</a></p>
     {% else %}
     -
     {% endif %}
 <p>Скан ПТС:
     {% if object.vehicle_passport_scan %}
     <a href="{{ object.vehicle_passport_scan.url }}"
-                download="{{ object.vehicle_passport_scan.name }}">{{ object.vp_filename }}</a></p>
+                download="{{ object.vehicle_passport_scan.name }}">{{ object.filename:object.vehicle_passport_scan }}</a></p>
     {% else %}
     -
     {% endif %}

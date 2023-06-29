@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'references.apps.ReferencesConfig',
+    'accounting.apps.AccountingConfig',
     'django_celery_beat'
 ]
 
