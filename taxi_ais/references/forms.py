@@ -19,7 +19,6 @@ class CreateDriverForm(forms.Form):
     driving_license_id = forms.CharField(max_length=20, required=False, label='Номер прав')
     driving_license_category = forms.CharField(max_length=30, required=False, label='Категория')
     driving_license_validity_period = forms.DateField(required=False, label='Срок действия')
-    rent_sum = forms.IntegerField(required=False, label='Аренда')
     deposit = forms.IntegerField(required=False, label='Залог')
     photo = forms.ImageField(required=False, label='Фото водителя',
                              widget=forms.FileInput(attrs={'multiple': 'multiple'}))
@@ -37,7 +36,7 @@ class UpdateDriverForm(forms.ModelForm):
         model = Driver
         fields = ('second_name', 'first_name', 'patronimic', 'name', 'citizenship', 'passport_id',
                   'passport_issue_date', 'date_of_birth', 'place_of_birth', 'residence_place', 'phone_number',
-                  'driving_license_id', 'driving_license_category', 'driving_license_validity_period', 'rent_sum',
+                  'driving_license_id', 'driving_license_category', 'driving_license_validity_period',
                   'deposit', 'status', 'comment')
 
 

@@ -38,8 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'references.apps.ReferencesConfig',
     'accounting.apps.AccountingConfig',
-    'django_celery_beat'
+    'django_celery_beat',
+    'rest_framework',
+    'drf_spectacular',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
