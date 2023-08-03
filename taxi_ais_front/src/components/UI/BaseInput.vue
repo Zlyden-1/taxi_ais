@@ -1,16 +1,28 @@
 <template>
-<input :value="value" @input="updateInput" class="input" type="text">
+<input :value="modelValue" :type="type" :placeholder="placeholder" @input="updateInput" class="input">
 </template>
 
 <script>
 export default {
     name: "base-input",
     props: {
-      value: [String, Number]
+      modelValue: {
+        type: [String, Number, Date],
+        required: true,
+      },
+      placeholder: {
+        type: [String, Number],
+        required: false,
+      },
+      type: {
+        type: String,
+        required: false,
+        default: 'text',
+      }
     },
     methods: {
       updateInput(event) {
-        this.$emit('update:value', event.target.value)
+        this.$emit('update:modelValue', event.target.value)
       }
     }
 }

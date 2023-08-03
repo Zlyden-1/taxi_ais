@@ -8,7 +8,7 @@
 
 <script>
 export default {
-    name: "create-post-dialog",
+    name: "base-dialog",
     props: {
         show: {
             type: Boolean,
@@ -39,6 +39,8 @@ export default {
     border-radius: 12px;
     min-width: 300px;
     min-height: 50px;
-    padding: 15px;
+    max-width: 50%;
+    max-height: 90%;
+    overflow-y: scroll;
 }
 </style>
