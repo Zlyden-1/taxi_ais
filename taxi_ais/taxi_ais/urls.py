@@ -20,13 +20,8 @@ from django.conf.urls.static import static
 from django.shortcuts import render
 
 
-def index(request):
-    return render(request, 'references/index.html')
-
-
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', index, name='index'),
-    path('references/', include('references.urls', namespace='references')),
-    path("accounting/", include('accounting.urls', namespace='accounting')),
+    path("admin/", admin.site.urls),
+    path("api/references/", include("references.urls", namespace="references")),
+    path("accounting/", include("accounting.urls", namespace="accounting")),
 ]

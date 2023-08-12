@@ -1,27 +1,17 @@
 from django.urls import path
 
-from . import views, api_views
+from . import api_views
 
-app_name = 'references'
+app_name = "references"
 urlpatterns = [
-    path('drivers/', views.drivers, name='drivers'),
-    path('drivers/active', views.active_drivers, name='active_drivers'),
-    path('driver/<int:pk>', views.DriverDetail.as_view(), name='driver'),
-    path('driver/<int:pk>/delete', views.DriverDeleteView.as_view(), name='delete_driver'),
-    path('driverphoto/<int:pk>/delete', views.DriverPhotoDeleteView.as_view(), name='delete_driver_photo'),
-    path('drivinglicensephoto/<int:pk>/delete', views.DrivingLicenceDeleteView.as_view(),
-         name='delete_driving_license_photo'),
-    path('driverphoto/<int:pk>/delete', views.DriverPassportPhotoDeleteView.as_view(),
-         name='delete_driver_passport_photo'),
-    path('driverphoto/<int:pk>/delete', views.RentingContractPhotoDeleteView.as_view(),
-         name='delete_renting_contract_photo'),
-    path('driver/<int:pk>/add_photo', views.add_driver_photo, name='add_driver_photo'),
-    path('driver/<int:pk>/add_passport_photo', views.add_driver_passport_photo, name='add_passport_photo'),
-    path('driver/<int:pk>/add_license_photo', views.add_driving_license_photo, name='add_license_photo'),
-    path('driver/<int:pk>/add_contract_photo', views.add_renting_contract_photo, name='add_contract_photo'),
-    path('vehicles/', views.Vehicles.as_view(), name='vehicles'),
-    path('vehicles/active', views.ActiveVehicles.as_view(), name='active_vehicles'),
-    path('vehicle/<str:pk>', views.VehicleDetail.as_view(), name='vehicle'),
-    path('vehicle/<str:pk>/delete', views.VehicleDeleteView.as_view(), name='delete_vehicle'),
-    path('api/drivers/', api_views.DriversListAPI.as_view(), name='api_drivers'),
+    path("drivers/", api_views.DriversListAPI.as_view(), name="driver_list"),
+    path("drivers/options/", api_views.DriversOptionsListAPI.as_view(), name="driver_options"),
+    path("drivers/create/", api_views.CreateDriverAPI.as_view(), name="create_driver"),
+    path("driver/<int:pk>/", api_views.DriverDetailAPI.as_view(), name="driver_details"),
+    path("vehicles/", api_views.VehicleListAPI.as_view(), name="vehicle_list"),
+    path("vehicle/<str:pk>/", api_views.VehicleDetailAPI.as_view(), name="vehicle_details"),
+    path("vehicles/types/", api_views.VehicleTypeOptionsListAPI.as_view(), name="vehicle_type_list"),
+    path("vehicles/locations/", api_views.VehicleLocationOptionsListAPI.as_view(), name="vehicle_location_list"),
+    path("vehicles/statuses/", api_views.VehicleStatusOptionsListAPI.as_view(), name="vehicle_status_list"),
+    path("vehicles/create/", api_views.VehicleCreateAPI.as_view(), name="create_vehicle"),
 ]
