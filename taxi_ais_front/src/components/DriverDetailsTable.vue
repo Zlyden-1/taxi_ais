@@ -89,7 +89,6 @@ export default {
     },
     methods: {
         updateField(event) {
-            console.log(event)
             this.$emit('updateDriver', event)
         }
     }

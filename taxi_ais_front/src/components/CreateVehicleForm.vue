@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import requests from '@/api/api'
 
 export default {
     data() {
@@ -145,14 +145,14 @@ export default {
             };
         },
         async fetchOptions() {
-            const vehicleTypeRequest = axios.get('http://127.0.0.1:8000/api/references/vehicles/types/');
-            const statusRequest = axios.get('http://127.0.0.1:8000/api/references/vehicles/statuses/');
-            const locationRequest = axios.get('http://127.0.0.1:8000/api/references/vehicles/locations/');
-            const driverRequest = axios.get('http://127.0.0.1:8000/api/references/drivers/options/');
+            const vehicleTypeRequest = requests.getVehicleTypeOptions();
+            const statusRequest = requests.getVehicleStatusOptions();
+            const locationRequest = requests.getVehicleLocationOptions();
+            const driverRequest = requests.getDriverOptions();
             const responces = await Promise.allSettled([vehicleTypeRequest, statusRequest, locationRequest, driverRequest]);
             [this.vehicleTypeOptions, 
             this.statusOptions, 
-            this.locationOptions, 
+            this.locationOptions,
             this.driverOptions] = responces.map(responce => responce.value.data);
         }
     },

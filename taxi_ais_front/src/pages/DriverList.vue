@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import requests from '@/api/api';
 import CreateDriverForm from '@/components/CreateDriverForm';
 import DriversTable from "@/components/DriversTable";
 
@@ -41,25 +41,26 @@ export default {
     methods: {
         async fetchDrivers() { 
             this.isDriversLoading = true;
-            const data = await axios.get('http://127.0.0.1:8000/api/references/drivers/');
+            const data = await requests.getDrivers();
             this.drivers_list = data.data;
             this.isDriversLoading = false;
         },
         async createDriver(driver) {
             this.isDriversLoading = true;
             this.dialogVisible = false;
-            const newDriver = (await axios.post('http://127.0.0.1:8000/api/references/drivers/create/', driver)).data;
+            const response = await requests.createDriver(driver);
+            const newDriver = response.data;
             this.drivers_list.push(newDriver);
             this.isDriversLoading = false;
         },
         async deleteDriver(driver) {
             this.isDriversLoading = true;
-            const response = await axios.delete(`http://127.0.0.1:8000/api/references/driver/${driver.id}`)
+            const response = await requests.deleteDriver(driver.id);
             if (response.status === 204) {
-                this.drivers_list = this.drivers_list.filter(p => p.id !== driver.id)
+                this.drivers_list = this.drivers_list.filter(p => p.id !== driver.id);
             }
             else {
-                alert('памагити')
+                alert('Ошибка при удалении. Обновите страницу или сообщите об ошибке.');
             }
             this.isDriversLoading = false;
         },

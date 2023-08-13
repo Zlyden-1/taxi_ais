@@ -1,17 +1,15 @@
 <template>
     <base-header>{{ driver.name }} </base-header>
     <div class="table__container">
-        <driver-details-table
-            :driver="driver"
+        <vehicle-details-table
+            :vehicle="vehicle"
             :verbose="fieldVerboseNames"
-            @updateVehicle="updateVehicle"
-            @commit="commitVehicleChanges"
         />
     </div>
     </template>
     
     <script>
-    import axios from 'axios';
+    import requests from '@/api/api';
     import VehicleDetailsTable from '@/components/VehicleDetailsTable';
     
     export default {
@@ -68,8 +66,8 @@
         methods: {
             async fetchVehicle() {
                 this.isVehicleLoading = true;
-                const responce = await axios.get(`http://127.0.0.1:8000/api/references/driver/${this.$route.params.id}`);
-                this.driver = responce.data;
+                const responce = await requests.getVehicle(this.$route.params.VIN);
+                this.vehicle = responce.data;
                 this.isVehicleLoading = false;
             },
             updateVehicle(changedValue) {
@@ -77,7 +75,7 @@
             },
             async commitVehicleChanges() {
                 this.isVehicleLoading = true;
-                await axios.patch(`http://127.0.0.1:8000/api/references/driver/${this.$route.params.id}`, this.changes);
+                await requests.patchVehicle();
                 await this.fetchVehicle();
             }
         }

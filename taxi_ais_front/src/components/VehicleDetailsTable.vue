@@ -6,7 +6,7 @@
             :key="key"
         >
             <th>{{ verbose[key] }}</th>
-            <td v-if="key === 'id'">
+            <td v-if="readOnlyFields.includes(key)">
                 <base-input
                     disabled
                     :modelValue="driver[key]"
@@ -81,9 +81,10 @@ export default {
             dateFields: [],
             numberFields: [],
             selectFields: [],
-            driverStatusOptions: [
-                {value: true, name: "Активен"},
-                {value: false, name: "Неактивен"}
+            readOnlyFields: [],
+            rentOptions: [
+                {value: 'А', name: "Аренда"},
+                {value: 'В', name: "Выкуп"}
             ],
         }
     },

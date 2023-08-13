@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import requests from '@/api/api'
 import VehicleTable from '@/components/VehicleTable';
 import CreateVehicleForm from '@/components/CreateVehicleForm';
 
@@ -33,7 +33,7 @@ export default {
     methods: {
         async fetchVehicles() {
             this.isVehiclesLoading = true;
-            const responce = await axios.get('http://127.0.0.1:8000/api/references/vehicles/');
+            const responce = await requests.getVehicles();
             this.vehicleList = responce.data;
             this,this.isVehiclesLoading = false;
         },
@@ -44,7 +44,7 @@ export default {
             this.isVehiclesLoading = true;
             this.dialogVisible = false;
             try{
-                const newVehicle = (await axios.post('http://127.0.0.1:8000/api/references/vehicles/create/', vehicle)).data;
+                const newVehicle = (await requests.createVehicle(vehicle)).data;
                 this.vehicleList.push(newVehicle);
             } catch(e) {
                 console.log(e)

@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import requests from '@/api/api'
 import DriverDetailsTable from '@/components/DriverDetailsTable';
 
 export default {
@@ -72,7 +72,7 @@ export default {
     methods: {
         async fetchDriver() {
             this.isDriverLoading = true;
-            const responce = await axios.get(`http://127.0.0.1:8000/api/references/driver/${this.$route.params.id}`);
+            const responce = await requests.getDriver(this.$route.params.id);
             this.driver = responce.data;
             this.isDriverLoading = false;
         },
@@ -81,7 +81,7 @@ export default {
         },
         async commitDriverChanges() {
             this.isDriverLoading = true;
-            await axios.patch(`http://127.0.0.1:8000/api/references/driver/${this.$route.params.id}`, this.changes);
+            await requests.patchDriver(this.$route.params.id, this.changes);
             await this.fetchDriver();
         }
     }

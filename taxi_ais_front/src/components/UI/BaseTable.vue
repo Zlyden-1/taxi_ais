@@ -23,7 +23,7 @@ export default {
     border: 1px solid teal;
     color: white;
 }
-    .table td {
+.table td {
     border: 1px solid teal;
     padding: 5px;
     box-sizing: border-box;
