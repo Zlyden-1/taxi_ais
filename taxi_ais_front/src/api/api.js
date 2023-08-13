@@ -26,7 +26,10 @@ export default {
         return axios.post('http://127.0.0.1:8000/api/references/vehicles/create/', vehicleData);
     },
     patchVehicle(vehicleId, changes) {
-        return axios.patch(`http://127.0.0.1:8000/api/references/driver/${vehicleId}/`, changes);
+        return axios.patch(`http://127.0.0.1:8000/api/references/vehicle/${vehicleId}/`, changes);
+    },
+    deleteVehicle(vehicleId) {
+        return axios.delete(`http://127.0.0.1:8000/api/references/vehicle/${vehicleId}/`);
     },
     getVehicleTypeOptions() {
         return axios.get('http://127.0.0.1:8000/api/references/vehicles/types/');

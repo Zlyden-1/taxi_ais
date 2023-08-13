@@ -1,10 +1,16 @@
 <template>
-    <base-header>{{ driver.name }} </base-header>
-    <div class="table__container">
+    <base-header>{{ vehicle.vehicle_type.name }} {{ vehicle.license_plate }}</base-header>
+    <div class="table__container" v-if="!isVehicleLoading">
         <vehicle-details-table
             :vehicle="vehicle"
             :verbose="fieldVerboseNames"
+            :options="options"
+            @updateVehicle="updateVehicle"
+            @commit="commitVehicleChanges"
         />
+    </div>
+    <div v-else>
+        Загрузка...
     </div>
     </template>
     
@@ -37,7 +43,8 @@
                     vehicle_type: '',
                     status: '',
                     location: '',
-                    driver: ''
+                    driver: '',
+                    usage_history: '',
                 },
                 fieldVerboseNames: {
                     VIN: 'VIN',
@@ -56,18 +63,43 @@
                     vehicle_type: 'Тип ТС',
                     status: 'Статус',
                     location: 'Место базирования',
-                    driver: 'Водитель'
+                    driver: 'Водитель',
+                    usage_history: 'История использования',
                 },
+                options: {
+                    rent_type: [
+                        { value: "А", name: "Аренда" },
+                        { value: "В", name: "Выкуп" }
+                    ],
+                    vehicle_type: [],
+                    status: [],
+                    location: [],
+                    driver: []
+                }
             }
         },
         beforeMount() {
-            this.fetchVehicle()
+            this.fetchOptions();
+            this.fetchVehicle();
         },
         methods: {
             async fetchVehicle() {
                 this.isVehicleLoading = true;
                 const responce = await requests.getVehicle(this.$route.params.VIN);
-                this.vehicle = responce.data;
+                const vehicle = responce.data;
+                for (const [key, value] of Object.entries(vehicle)) {
+                    if (value == null) {
+                        vehicle[key] = '';
+                    }
+                }
+                if (vehicle.rent_type) {
+                    console.log(vehicle.rent_type);
+                    vehicle.rent_type = {value: vehicle.rent_type, name: ''};
+                    const rent_type_name = this.options.rent_type.find((type) => type.value === vehicle.rent_type.value).name;
+                    console.log(rent_type_name);
+                    vehicle.rent_type.name = rent_type_name
+                }
+                this.vehicle = vehicle;
                 this.isVehicleLoading = false;
             },
             updateVehicle(changedValue) {
@@ -75,9 +107,22 @@
             },
             async commitVehicleChanges() {
                 this.isVehicleLoading = true;
-                await requests.patchVehicle();
+                await requests.patchVehicle(this.$route.params.VIN, this.changes);
                 await this.fetchVehicle();
-            }
+                this.changes = {};
+            },
+            async fetchOptions() {
+                const vehicleTypeRequest = requests.getVehicleTypeOptions();
+                const statusRequest = requests.getVehicleStatusOptions();
+                const locationRequest = requests.getVehicleLocationOptions();
+                const driverRequest = requests.getDriverOptions();
+                const responces = await Promise.allSettled([vehicleTypeRequest, statusRequest, locationRequest, driverRequest]);
+                [this.options.vehicle_type, 
+                this.options.status, 
+                this.options.location,
+                this.options.driver] = responces.map(responce => responce.value.data);
+                this.options.driver.unshift({name: 'Нет', value: ''}, this.vehicle.driver);
+            },
         }
     }
     </script>

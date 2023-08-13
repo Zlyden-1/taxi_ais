@@ -1,67 +1,35 @@
 <template>
-<form @submit.prevent>
-    <base-table>
-        <tr 
-            v-for="key in Object.keys(driver)"
-            :key="key"
-        >
-            <th>{{ verbose[key] }}</th>
-            <td v-if="readOnlyFields.includes(key)">
-                <base-input
-                    disabled
-                    :modelValue="driver[key]"
-                    style="margin-top: 0;"
-                />
-            </td>
-            <td
-                v-else-if="selectFields.includes(key)"
-            >
-                <key-value-select
-                    @update="updateField"
-                    :key_="key"
-                    :modelValue="driver[key]"
-                    :options="driverStatusOptions"
-                    style="margin-top: 0;"
-                />
-            </td>
-            <td v-else-if="dateFields.includes(key)">
-                <key-value-input
-                    @update="updateField"
-                    :key_="key"
-                    :modelValue="driver[key]"
-                    style="margin-top: 0;"
-                    :type="'date'"
-                />
-            </td>
-            <td v-else-if="numberFields.includes(key)">
-                <key-value-input
-                    @update="updateField"
-                    :key_="key"
-                    :modelValue="driver[key]"
-                    style="margin-top: 0;"
-                    :type="'number'"
-                />
-            </td>
-            <td v-else>
-                <key-value-input
-                    @update="updateField"
-                    :key_="key"
-                    :modelValue="driver[key]"
-                    style="margin-top: 0;"
-                    :type="'text'"
-                />
-            </td>
-        </tr> 
-    </base-table>
-    <div style="display: flex; align-items: end;">
-        <base-button 
-            @click="$emit('commit')"
-            style="margin-top: 15px; margin-left: auto;"
-        >
-            Сохранить изменения
-        </base-button>
-    </div>
-</form>
+    <form @submit.prevent>
+        <base-table>
+            <tr v-for="key in Object.keys(vehicle)" :key="key">
+                <th>{{ verbose[key] }}</th>
+                <td v-if="readOnlyFields.includes(key)">
+                    <base-input disabled :modelValue="vehicle[key]" style="margin-top: 0;" />
+                </td>
+                <td v-else-if="selectFields.includes(key)">
+                    <key-value-select @update="updateField" :key_="key" :value="vehicle[key].value"
+                        :options="options[key]" style="margin-top: 0;" />
+                </td>
+                <td v-else-if="dateFields.includes(key)">
+                    <key-value-input @update="updateField" :key_="key" :modelValue="vehicle[key]" style="margin-top: 0;"
+                        :type="'date'" />
+                </td>
+                <td v-else-if="numberFields.includes(key)">
+                    <key-value-input @update="updateField" :key_="key" :modelValue="vehicle[key]" style="margin-top: 0;"
+                        :type="'number'" />
+                </td>
+                <td v-else>
+                    <key-value-input @update="updateField" :key_="key" :modelValue="vehicle[key]" style="margin-top: 0;"
+                        :type="'text'" />
+                </td>
+            </tr>
+        </base-table>
+        <div style="display: flex; align-items: end;">
+            <base-button @click="$emit('commit')" style="margin-top: 15px; margin-left: auto;">
+                Сохранить изменения
+            </base-button>
+        </div>
+    </form>
 </template>
 
 <script>
@@ -74,29 +42,27 @@ export default {
         verbose: {
             type: Object,
             required: true
+        },
+        options: {
+            type: Object,
+            required: true
         }
     },
     data() {
         return {
-            dateFields: [],
-            numberFields: [],
-            selectFields: [],
-            readOnlyFields: [],
-            rentOptions: [
-                {value: 'А', name: "Аренда"},
-                {value: 'В', name: "Выкуп"}
-            ],
+            dateFields: ["leasing_contract_date"],
+            numberFields: ["manufacture_year"],
+            selectFields: ["rent_type", "vehicle_type", "status", "location", "driver"],
+            readOnlyFields: ["VIN", "usage_history"],
         }
     },
     methods: {
         updateField(event) {
             console.log(event)
-            this.$emit('updateDriver', event)
-        }
-    }
+            this.$emit('updateVehicle', event)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

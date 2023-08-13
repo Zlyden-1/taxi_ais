@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import requests from '@/api/api'
+import requests from '@/api/api';
 
 export default {
     data() {
