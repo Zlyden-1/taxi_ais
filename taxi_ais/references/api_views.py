@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.db.models import QuerySet
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
@@ -22,6 +23,7 @@ from .serializers import (
     VehicleStatusOptionsSerializer,
     VehicleCreateUpdateSerializer,
     VehicleDetailSerializer,
+    VehicleHistorySerializer,
 )
 
 
@@ -116,6 +118,21 @@ class VehicleDetailAPI(RetrieveUpdateDestroyAPIView):
         update_serializer = self.get_serializer(instance)
         return Response(update_serializer.data)
 
+    def perform_update(self, serializer):
+        today = timezone.localdate()
+        vehicle = serializer.save()
+        last_renting = VehicleHistory.objects.filter(vehicle=vehicle).order_by("renting_date").last()
+        if last_renting:
+            last_renting.renting_end_date = today
+        if vehicle.driver:
+            vehicle.usage_history.add(
+                vehicle.driver,
+                through_defaults={
+                    "renting_date": today,
+                    "renting_end_date": None,
+                },
+            )
+
     def get_serializer(self, *args, **kwargs):
         update = kwargs.pop("update", False)
         serializer_class = self.get_serializer_class(update)
@@ -124,3 +141,14 @@ class VehicleDetailAPI(RetrieveUpdateDestroyAPIView):
 
     def get_serializer_class(self, update=False):
         return self.update_serializer_class if update else self.serializer_class
+
+
+class VehicleHistoryListAPIView(ListAPIView):
+    serializer_class = VehicleHistorySerializer
+    queryset = VehicleHistory.objects.all()
+
+    def get_queryset(self):
+        queryset = self.queryset
+        if isinstance(queryset, QuerySet):
+            queryset = queryset.filter(vehicle=self.kwargs[self.lookup_field]).order_by("-renting_date")
+        return queryset

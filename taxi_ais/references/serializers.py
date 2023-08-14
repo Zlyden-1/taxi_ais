@@ -1,6 +1,8 @@
+from django.utils import timezone
+
 from rest_framework import serializers
 
-from .models import Driver, Vehicle, VehicleLocation, VehicleType, VehicleStatus
+from .models import Driver, Vehicle, VehicleLocation, VehicleType, VehicleStatus, VehicleHistory
 
 
 class DriverSerializer(serializers.ModelSerializer):
@@ -94,9 +96,13 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
             "vehicle_passport_scan",
             "acceptance_certificate_scan",
             "leasing_contract_scan",
+            "usage_history",
         ]
 
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+
+class VehicleHistorySerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="__str__")
+
+    class Meta:
+        model = VehicleHistory
+        fields = ("id", "name")

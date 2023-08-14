@@ -14,4 +14,5 @@ urlpatterns = [
     path("vehicles/locations/", api_views.VehicleLocationOptionsListAPI.as_view(), name="vehicle_location_list"),
     path("vehicles/statuses/", api_views.VehicleStatusOptionsListAPI.as_view(), name="vehicle_status_list"),
     path("vehicles/create/", api_views.VehicleCreateAPI.as_view(), name="create_vehicle"),
+    path("vehicle/<str:pk>/usage_history/", api_views.VehicleHistoryListAPIView.as_view(), name="usage_history_list"),
 ]

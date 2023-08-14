@@ -275,7 +275,6 @@ class VehicleDetailAPITests(APITestCase):
         "lessor": "1111",
         "manufacture_year": 11111,
         "rent_type": "А",
-        "usage_history": [],
     }
 
     def setUp(self):
@@ -300,12 +299,75 @@ class VehicleDetailAPITests(APITestCase):
         self.assertEquals(response.data, self.responce_data)
 
     def test_patch_vehicle(self):
+        self.assertEquals(len(Vehicle.objects.first().usage_history.all()), 0)
         responce_data = deepcopy(self.responce_data)
         responce_data["driver"] = OrderedDict([("value", 2), ("name", "other")])
         response = self.client.patch("/api/references/vehicle/11/", {"driver": 2}, format="json")
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data, responce_data)
+        self.assertEquals(len(Vehicle.objects.first().usage_history.all()), 1)
 
     def test_deletion(self):
         response = self.client.delete("/api/references/driver/1/")
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class VehicleHistoryListAPITests(APITestCase):
+    vehicle_data = {
+        "VIN": "11",
+        "vehicle_type": None,
+        "status": None,
+        "location": None,
+        "driver": None,
+        "license_plate": "11",
+        "registration_certificate_id": "11",
+        "vehicle_passport_id": "11",
+        "engine_id": "11",
+        "color": "11",
+        "leasing_contract_id": "111",
+        "insurance_policy_series": "111",
+        "insurance_policy_id": "11",
+        "leasing_contract_date": "2023-08-01",
+        "lessor": "1111",
+        "manufacture_year": 11111,
+        "rent_type": "А",
+    }
+    responce_data = [
+        OrderedDict([("id", 2), ("name", "ewfehjy LOGAN 11 с 2023-08-14 по сегодня")]),
+        OrderedDict([("id", 1), ("name", "other LOGAN 11 с 2000-01-01 по 2023-08-14")]),
+    ]
+
+    def setUp(self):
+        driver = Driver.objects.create(name="ewfehjy", status=True)
+        other_driver = Driver.objects.create(name="other", status=True)
+        type_ = VehicleType.objects.create(
+            brand="RENAULT", model="LOGAN", vehicle_type="jdcdjc", manufacturer="ldncd", rent_price=1000
+        )
+        status = VehicleStatus.objects.create(name="Активно", is_active=True)
+        location = VehicleLocation(place="Самара")
+        for i in driver, type_, status, location:
+            i.save()
+        vehicle = Vehicle.objects.create(**self.vehicle_data)
+        vehicle.vehicle_type = type_
+        vehicle.status = status
+        vehicle.location = location
+        vehicle.driver = driver
+        vehicle.save()
+        vehicle.usage_history.add(
+            other_driver,
+            through_defaults={
+                "renting_date": date(2000, 1, 1),
+                "renting_end_date": date.today(),
+            },
+        )
+        vehicle.usage_history.add(
+            driver,
+            through_defaults={
+                "renting_date": date.today(),
+                "renting_end_date": None,
+            },
+        )
+
+    def test_retrieve_history(self):
+        response = self.client.get("/api/references/vehicle/11/usage_history/")
+        self.assertEquals(response.data, self.responce_data)
