@@ -8,7 +8,7 @@
         <base-button style="margin-left: auto;" @click="showDialog">Добавить ТС</base-button>
     </div>
     <div class="table__container">
-        <vehicle-table :vehicleList="vehicleList" />
+        <vehicle-table :vehicleList="vehicleList" @delete="deleteVehicle"/>
     </div>
 </div>
 </template>
@@ -47,9 +47,18 @@ export default {
                 const newVehicle = (await requests.createVehicle(vehicle)).data;
                 this.vehicleList.push(newVehicle);
             } catch(e) {
-                console.log(e)
+                alert(e)
             }
             this.isDriversLoading = false;
+        },
+        async deleteVehicle(vehicleVIN) {
+            this.isVehiclesLoading = true;
+            try {
+                await requests.deleteVehicle(vehicleVIN);
+            } catch (e) {
+                alert('Возникла ошибка! Попробуйте обновить страницу и сообщите об ошибке.')
+            }
+            this.fetchVehicles()
         }
     },
     beforeMount() {

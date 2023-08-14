@@ -31,6 +31,7 @@
                     </base-button>
                     <base-button
                         style="margin-top: 5px;"
+                        @click="$emit('delete', vehicle.VIN)"
                     >
                         Удалить
                     </base-button>
@@ -49,7 +50,7 @@ export default {
             type: Array,
             default: () => []
         }
-    }
+    },
 }
 </script>
     

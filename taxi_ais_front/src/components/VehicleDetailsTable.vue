@@ -4,7 +4,14 @@
             <tr v-for="key in Object.keys(vehicle)" :key="key">
                 <th>{{ verbose[key] }}</th>
                 <td v-if="readOnlyFields.includes(key)">
-                    <base-input disabled :modelValue="vehicle[key]" style="margin-top: 0;" />
+                    <div v-if="listFields.includes(key)">
+                        <div v-for="item in vehicle[key]" :key="item.id">
+                            <p style="margin-top: 0;"> {{ item.name }} </p>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <base-input disabled :modelValue="vehicle[key]" style="margin-top: 0;" />
+                    </div>
                 </td>
                 <td v-else-if="selectFields.includes(key)">
                     <key-value-select @update="updateField" :key_="key" :value="vehicle[key].value"
@@ -54,11 +61,11 @@ export default {
             numberFields: ["manufacture_year"],
             selectFields: ["rent_type", "vehicle_type", "status", "location", "driver"],
             readOnlyFields: ["VIN", "usage_history"],
+            listFields: ["usage_history"],
         }
     },
     methods: {
         updateField(event) {
-            console.log(event)
             this.$emit('updateVehicle', event)
         },
     },

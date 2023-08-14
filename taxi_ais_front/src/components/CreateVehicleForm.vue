@@ -123,7 +123,6 @@ export default {
     methods: {
         createVehicle() {
             this.$emit('create', this.vehicle);
-            console.log(this.vehicle);
             this.vehicle = {
                 VIN: '',
                 license_plate: '',

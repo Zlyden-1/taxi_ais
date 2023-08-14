@@ -43,4 +43,7 @@ export default {
     getDriverOptions() {
         return axios.get('http://127.0.0.1:8000/api/references/drivers/options/');
     },
+    getVehicleHistory(vehicleId) {
+        return axios.get(`http://127.0.0.1:8000/api/references/vehicle/${vehicleId}/usage_history/`)
+    }
 }

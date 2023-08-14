@@ -79,6 +79,7 @@
             }
         },
         beforeMount() {
+            this.fetchUsageHistory();
             this.fetchOptions();
             this.fetchVehicle();
         },
@@ -87,19 +88,19 @@
                 this.isVehicleLoading = true;
                 const responce = await requests.getVehicle(this.$route.params.VIN);
                 const vehicle = responce.data;
-                for (const [key, value] of Object.entries(vehicle)) {
-                    if (value == null) {
-                        vehicle[key] = '';
-                    }
-                }
                 if (vehicle.rent_type) {
-                    console.log(vehicle.rent_type);
                     vehicle.rent_type = {value: vehicle.rent_type, name: ''};
                     const rent_type_name = this.options.rent_type.find((type) => type.value === vehicle.rent_type.value).name;
-                    console.log(rent_type_name);
                     vehicle.rent_type.name = rent_type_name
                 }
-                this.vehicle = vehicle;
+                for (const [key, value] of Object.entries(vehicle)) {
+                    if (value == null) {
+                        this.vehicle[key] = '';
+                    }
+                    else {
+                        this.vehicle[key] = value;
+                    }
+                }
                 this.isVehicleLoading = false;
             },
             updateVehicle(changedValue) {
@@ -123,6 +124,9 @@
                 this.options.driver] = responces.map(responce => responce.value.data);
                 this.options.driver.unshift({name: 'Нет', value: ''}, this.vehicle.driver);
             },
+            async fetchUsageHistory() {
+                this.vehicle.usage_history = (await requests.getVehicleHistory(this.$route.params.VIN)).data;
+            }
         }
     }
     </script>
