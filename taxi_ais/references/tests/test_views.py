@@ -357,13 +357,13 @@ class VehicleHistoryListAPITests(APITestCase):
             other_driver,
             through_defaults={
                 "renting_date": date(2000, 1, 1),
-                "renting_end_date": date.today(),
+                "renting_end_date": date(2023, 8, 14),
             },
         )
         vehicle.usage_history.add(
             driver,
             through_defaults={
-                "renting_date": date.today(),
+                "renting_date": date(2023, 8, 14),
                 "renting_end_date": None,
             },
         )

@@ -23,5 +23,5 @@ from django.shortcuts import render
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/references/", include("references.urls", namespace="references")),
-    path("accounting/", include("accounting.urls", namespace="accounting")),
+    path("api/accounting/", include("accounting.urls", namespace="accounting")),
 ]
