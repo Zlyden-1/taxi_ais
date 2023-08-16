@@ -6,12 +6,12 @@ app_name = "references"
 urlpatterns = [
     path("drivers/", api_views.DriversListAPI.as_view(), name="driver_list"),
     path(
-        "drivers/options/for_vehicles",
+        "drivers/options/for_vehicles/",
         api_views.DriversVehicleOptionsListAPI.as_view(),
         name="driver_options_for_vehicles",
     ),
     path(
-        "drivers/options/for_rents",
+        "drivers/options/for_rents/",
         api_views.DriversRentOptionsListAPI.as_view(),
         name="driver_options_for_rents",
     ),
