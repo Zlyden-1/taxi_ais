@@ -5,7 +5,16 @@ from . import api_views
 app_name = "references"
 urlpatterns = [
     path("drivers/", api_views.DriversListAPI.as_view(), name="driver_list"),
-    path("drivers/options/", api_views.DriversOptionsListAPI.as_view(), name="driver_options"),
+    path(
+        "drivers/options/for_vehicles",
+        api_views.DriversVehicleOptionsListAPI.as_view(),
+        name="driver_options_for_vehicles",
+    ),
+    path(
+        "drivers/options/for_rents",
+        api_views.DriversRentOptionsListAPI.as_view(),
+        name="driver_options_for_rents",
+    ),
     path("drivers/create/", api_views.CreateDriverAPI.as_view(), name="create_driver"),
     path("driver/<int:pk>/", api_views.DriverDetailAPI.as_view(), name="driver_details"),
     path("vehicles/", api_views.VehicleListAPI.as_view(), name="vehicle_list"),

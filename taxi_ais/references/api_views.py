@@ -32,9 +32,14 @@ class DriversListAPI(ListAPIView):
     queryset = Driver.objects.order_by("name")
 
 
-class DriversOptionsListAPI(ListAPIView):
+class DriversVehicleOptionsListAPI(ListAPIView):
     serializer_class = DriverOptionsSerializer
     queryset = Driver.objects.filter(vehicle=None, status=True).order_by("name")
+
+
+class DriversRentOptionsListAPI(ListAPIView):
+    serializer_class = DriverOptionsSerializer
+    queryset = Driver.objects.exclude(vehicle=None).filter(status=True).order_by("name")
 
 
 class CreateDriverAPI(CreateAPIView):
