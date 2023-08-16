@@ -45,5 +45,13 @@ export default {
     },
     getVehicleHistory(vehicleId) {
         return axios.get(`http://127.0.0.1:8000/api/references/vehicle/${vehicleId}/usage_history/`)
+    },
+    getRents(startDate, endDate) {
+        return axios.get(`http://127.0.0.1:8000/api/accounting/rents/`, {
+            params: {
+                start_date: startDate,
+                end_date: endDate,
+            }
+        })
     }
 }
