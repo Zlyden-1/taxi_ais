@@ -18,7 +18,7 @@ from .serializers import RentListSerializer
 
 class RentListAPIView(ListAPIView):
     serializer_class = RentListSerializer
-    queryset = Rent.objects.all()
+    queryset = Rent.objects.exclude(comment="Автоматическое начисление аренды")
 
     def list(self, request, *args, **kwargs):
         today = timezone.localdate()
