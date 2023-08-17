@@ -39,7 +39,7 @@
                 <legend>Общая информация о машине</legend>
                 <fieldset>
                     <legend>Водитель (если есть)</legend>
-                    <base-select v-model="vehicle.driver" :options="driverOptions"/>
+                    <base-select v-model="vehicle.driver" :options="driverOptions" required/>
                 </fieldset>
                 <fieldset>
                     <legend>Цвет</legend>
@@ -47,7 +47,7 @@
                 </fieldset>
                 <fieldset>
                     <legend>Тип ТС</legend>
-                    <base-select v-model="vehicle.vehicle_type" :options="vehicleTypeOptions"/>
+                    <base-select v-model="vehicle.vehicle_type" :options="vehicleTypeOptions" required/>
                 </fieldset>
                 <fieldset>
                     <legend>Год выпуска</legend>
@@ -55,15 +55,15 @@
                 </fieldset>
                 <fieldset>
                     <legend>Статус</legend>
-                    <base-select v-model="vehicle.status" :options="statusOptions"/>
+                    <base-select v-model="vehicle.status" :options="statusOptions" required/>
                 </fieldset>
                 <fieldset>
                     <legend>Место базирования</legend>
-                    <base-select v-model="vehicle.location" :options="locationOptions"/>
+                    <base-select v-model="vehicle.location" :options="locationOptions" required/>
                 </fieldset>
                 <fieldset>
                     <legend>Тип использования</legend>
-                    <base-select v-model="vehicle.rent_type" :options="rentTypeOptions"/>
+                    <base-select v-model="vehicle.rent_type" :options="rentTypeOptions" required/>
                 </fieldset>
             </fieldset>
             <fieldset>
@@ -147,7 +147,7 @@ export default {
             const vehicleTypeRequest = requests.getVehicleTypeOptions();
             const statusRequest = requests.getVehicleStatusOptions();
             const locationRequest = requests.getVehicleLocationOptions();
-            const driverRequest = requests.getDriverOptions();
+            const driverRequest = requests.getDriverOptionsForVehicles();
             const responces = await Promise.allSettled([vehicleTypeRequest, statusRequest, locationRequest, driverRequest]);
             [this.vehicleTypeOptions, 
             this.statusOptions, 

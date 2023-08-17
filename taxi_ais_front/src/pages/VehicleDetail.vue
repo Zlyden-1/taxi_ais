@@ -116,7 +116,7 @@
                 const vehicleTypeRequest = requests.getVehicleTypeOptions();
                 const statusRequest = requests.getVehicleStatusOptions();
                 const locationRequest = requests.getVehicleLocationOptions();
-                const driverRequest = requests.getDriverOptions();
+                const driverRequest = requests.getDriverOptionsForVehicles();
                 const responces = await Promise.allSettled([vehicleTypeRequest, statusRequest, locationRequest, driverRequest]);
                 [this.options.vehicle_type, 
                 this.options.status, 

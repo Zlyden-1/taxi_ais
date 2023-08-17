@@ -1,6 +1,6 @@
 <template>
 <base-header>Аренда</base-header>
-<base-dialog v-model="dialogVisible">
+<base-dialog v-model:show="dialogVisible">
     <add-rent-form/>
 </base-dialog>
 <div class="content">
@@ -44,6 +44,9 @@ export default {
             this.isRentsLoading = true;
             this.rentList = (await requests.getRents(startDate, endDate)).data;
             this.isRentsLoading = false;
+        },
+        showDialog() {
+            this.dialogVisible = true;
         },
     },
     mounted() {

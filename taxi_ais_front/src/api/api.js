@@ -40,8 +40,11 @@ export default {
     getVehicleLocationOptions() {
         return axios.get('http://127.0.0.1:8000/api/references/vehicles/locations/');
     },
-    getDriverOptions() {
-        return axios.get('http://127.0.0.1:8000/api/references/drivers/options/');
+    getDriverOptionsForVehicles() {
+        return axios.get('http://127.0.0.1:8000/api/references/drivers/options/for_vehicles/');
+    },
+    getDriverOptionsForRents() {
+        return axios.get('http://127.0.0.1:8000/api/references/drivers/options/for_rents/');
     },
     getVehicleHistory(vehicleId) {
         return axios.get(`http://127.0.0.1:8000/api/references/vehicle/${vehicleId}/usage_history/`)
