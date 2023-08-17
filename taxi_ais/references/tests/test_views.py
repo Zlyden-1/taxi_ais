@@ -233,7 +233,7 @@ class VehicleOptionsAPITest(APITestCase):
         self.assertEquals(response.data, [OrderedDict([("value", 1), ("name", "Самара")])])
 
     def test_retrieve_driver_options_list(self):
-        response = self.client.get("/api/references/drivers/options/")
+        response = self.client.get("/api/references/drivers/options/for_vehicles/")
         self.assertEquals(response.data, [OrderedDict([("value", 1), ("name", "ewfehjy")])])
 
 
@@ -371,3 +371,122 @@ class VehicleHistoryListAPITests(APITestCase):
     def test_retrieve_history(self):
         response = self.client.get("/api/references/vehicle/11/usage_history/")
         self.assertEquals(response.data, self.responce_data)
+
+
+class RentOptionsListAPITest(APITestCase):
+    test_driver_data = [
+        {
+            "second_name": "dcvftn",
+            "first_name": "cdcvfgbhnj",
+            "patronimic": "cdfbhnjk",
+            "name": "vehicle true",
+            "citizenship": "",
+            "passport_id": "",
+            "passport_issue_date": date(1900, 1, 1),
+            "date_of_birth": date(1900, 1, 1),
+            "place_of_birth": "",
+            "residence_place": "",
+            "phone_number": "123456",
+            "driving_license_id": "swvb",
+            "driving_license_category": "fvgbg",
+            "driving_license_validity_period": "2023-07-15",
+            "deposit": 11111,
+            "status": True,
+            "comment": "aaaaaa",
+            "telegram_id": "@dghh",
+        },
+        {
+            "second_name": "dcvftn",
+            "first_name": "cdcvfgbhnj",
+            "patronimic": "cdfbhnjk",
+            "name": "no vehicle true",
+            "citizenship": "",
+            "passport_id": "",
+            "passport_issue_date": date(1900, 1, 1),
+            "date_of_birth": date(1900, 1, 1),
+            "place_of_birth": "",
+            "residence_place": "",
+            "phone_number": "123456",
+            "driving_license_id": "swvb",
+            "driving_license_category": "fvgbg",
+            "driving_license_validity_period": "2023-07-15",
+            "deposit": 11111,
+            "status": True,
+            "comment": "aaaaaa",
+            "telegram_id": "@dghh",
+        },
+        {
+            "second_name": "dcvftn",
+            "first_name": "cdcvfgbhnj",
+            "patronimic": "cdfbhnjk",
+            "name": "vehicle false",
+            "citizenship": "",
+            "passport_id": "",
+            "passport_issue_date": date(1900, 1, 1),
+            "date_of_birth": date(1900, 1, 1),
+            "place_of_birth": "",
+            "residence_place": "",
+            "phone_number": "123456",
+            "driving_license_id": "swvb",
+            "driving_license_category": "fvgbg",
+            "driving_license_validity_period": "2023-07-15",
+            "deposit": 11111,
+            "status": False,
+            "comment": "aaaaaa",
+            "telegram_id": "@dghh",
+        },
+        {
+            "second_name": "dcvftn",
+            "first_name": "cdcvfgbhnj",
+            "patronimic": "cdfbhnjk",
+            "name": "no vehicle false",
+            "citizenship": "",
+            "passport_id": "",
+            "passport_issue_date": date(1900, 1, 1),
+            "date_of_birth": date(1900, 1, 1),
+            "place_of_birth": "",
+            "residence_place": "",
+            "phone_number": "123456",
+            "driving_license_id": "swvb",
+            "driving_license_category": "fvgbg",
+            "driving_license_validity_period": "2023-07-15",
+            "deposit": 11111,
+            "status": False,
+            "comment": "aaaaaa",
+            "telegram_id": "@dghh",
+        },
+    ]
+
+    response_data = [OrderedDict([("value", 1), ("name", "vehicle true")])]
+
+    def setUp(self):
+        for i in self.test_driver_data:
+            j = Driver.objects.create(**i)
+            j.save()
+        type_ = VehicleType.objects.create(
+            brand="RENAULT", model="LOGAN", vehicle_type="jdcdjc", manufacturer="ldncd", rent_price=1000
+        )
+        status = VehicleStatus.objects.create(name="Активно", is_active=True)
+        location = VehicleLocation(place="Самара")
+        for i in type_, status, location:
+            i.save()
+        Vehicle.objects.create(
+            VIN="пгплршрш",
+            license_plate="рлоилишг",
+            vehicle_type=type_,
+            status=status,
+            driver_id=1,
+            location=location,
+        )
+        Vehicle.objects.create(
+            VIN="1111",
+            license_plate="dsfc",
+            vehicle_type=type_,
+            status=status,
+            driver_id=3,
+            location=location,
+        )
+
+    def test_some(self):
+        response = self.client.get("/api/references/drivers/options/for_rents/")
+        self.assertEquals(response.data, self.response_data)

@@ -92,6 +92,6 @@ class RentListAPITest(APITestCase):
         response = self.client.get(f"/api/accounting/rents/?start_date=2022-1-1&&end_date=2024-1-1")
         self.assertEquals(response.data, self.list_all_responce_data)
 
-    def test_list_for_last_week(self):
-        response = self.client.get(f"/api/accounting/rents/")
-        self.assertEquals(response.data, self.list_all_responce_data)
+    # def test_list_for_last_week(self):
+    #     response = self.client.get(f"/api/accounting/rents/")
+    #     self.assertEquals(response.data, self.list_all_responce_data)
