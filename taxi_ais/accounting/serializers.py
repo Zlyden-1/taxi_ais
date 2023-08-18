@@ -21,3 +21,9 @@ class RentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rent
         fields = ["driver", "payment_date", "summ"]
+
+
+class RentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rent
+        fields = "__all__"

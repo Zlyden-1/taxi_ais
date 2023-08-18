@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, time
 from collections import OrderedDict
 from copy import deepcopy
 
@@ -95,3 +95,39 @@ class RentListAPITest(APITestCase):
     # def test_list_for_last_week(self):
     #     response = self.client.get(f"/api/accounting/rents/")
     #     self.assertEquals(response.data, self.list_all_responce_data)
+
+
+class RentCreateAPITest(APITestCase):
+    first_rent_data = OrderedDict(
+        {
+            "driver": 2,
+            "summ": 1000,
+            "comment": "first",
+        }
+    )
+    next_rent_data = OrderedDict(
+        {
+            "driver": 1,
+            "summ": 1000,
+            "comment": "second",
+        }
+    )
+
+    def setUp(self):
+        driver = Driver.objects.create(name="ewfehjy", status=True)
+        other_driver = Driver.objects.create(name="other", status=True)
+        Rent.objects.create(driver=driver, summ=1000, payment_date=date(2023, 8, 15), time=time(9, 0, 0), balance=1000)
+
+    def test_add_first_rent(self):
+        responce = self.client.post("/api/accounting/rent/create/", self.first_rent_data, format="json")
+        driver_rents = Rent.objects.filter(driver_id=2)
+        self.assertEquals(responce.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(responce.data["balance"], 1000)
+        self.assertEquals(len(driver_rents), 1)
+
+    def test_add_next_rent(self):
+        responce = self.client.post("/api/accounting/rent/create/", self.next_rent_data, format="json")
+        driver_rents = Rent.objects.filter(driver_id=1)
+        self.assertEquals(responce.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(responce.data["balance"], 2000)
+        self.assertEquals(len(driver_rents), 2)
