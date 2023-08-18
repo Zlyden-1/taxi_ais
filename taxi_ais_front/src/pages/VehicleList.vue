@@ -44,7 +44,7 @@ export default {
             this.isVehiclesLoading = true;
             this.dialogVisible = false;
             try{
-                const newVehicle = (await requests.createVehicle(vehicle)).data;
+                const newVehicle = (await requests.postCreateVehicle(vehicle)).data;
                 this.vehicleList.push(newVehicle);
             } catch(e) {
                 alert(e)

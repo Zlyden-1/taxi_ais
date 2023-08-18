@@ -48,7 +48,7 @@ export default {
         async createDriver(driver) {
             this.isDriversLoading = true;
             this.dialogVisible = false;
-            const response = await requests.createDriver(driver);
+            const response = await requests.postCreateDriver(driver);
             const newDriver = response.data;
             this.drivers_list.push(newDriver);
             this.isDriversLoading = false;

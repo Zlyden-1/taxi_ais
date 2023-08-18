@@ -4,7 +4,7 @@ export default {
     getDrivers() {
         return axios.get('http://127.0.0.1:8000/api/references/drivers/');
     },
-    createDriver(driverData) {
+    postCreateDriver(driverData) {
         return axios.post('http://127.0.0.1:8000/api/references/drivers/create/', driverData);
     },
     deleteDriver(driverId) {
@@ -22,7 +22,7 @@ export default {
     getVehicles() {
         return axios.get(`http://127.0.0.1:8000/api/references/vehicles/`);
     },
-    createVehicle(vehicleData) {
+    postCreateVehicle(vehicleData) {
         return axios.post('http://127.0.0.1:8000/api/references/vehicles/create/', vehicleData);
     },
     patchVehicle(vehicleId, changes) {
@@ -47,7 +47,7 @@ export default {
         return axios.get('http://127.0.0.1:8000/api/references/drivers/options/for_rents/');
     },
     getVehicleHistory(vehicleId) {
-        return axios.get(`http://127.0.0.1:8000/api/references/vehicle/${vehicleId}/usage_history/`)
+        return axios.get(`http://127.0.0.1:8000/api/references/vehicle/${vehicleId}/usage_history/`);
     },
     getRents(startDate, endDate) {
         return axios.get(`http://127.0.0.1:8000/api/accounting/rents/`, {
@@ -55,6 +55,9 @@ export default {
                 start_date: startDate,
                 end_date: endDate,
             }
-        })
-    }
+        });
+    },
+    postCreateRent(rentData) {
+        return axios.post(`http://127.0.0.1:8000/api/accounting/rent/create/`, rentData);
+    },
 }

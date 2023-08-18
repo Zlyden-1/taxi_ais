@@ -37,7 +37,12 @@ export default {
             this.driverOptions = responce.data;
         },
         async createRent() {
-            
+            this.$emit('create', this.rent);
+            this.rent = {
+                driver: '',
+                summ: '',
+                comment: ''
+            }
         }
     },
     mounted() {

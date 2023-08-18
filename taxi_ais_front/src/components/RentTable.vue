@@ -10,8 +10,9 @@
         <th>
             {{ driver }}
         </th>
-        <td v-for="date in Object.keys(formattedRentList[driver])" :key="date">
-            {{ formattedRentList[driver][date] }}
+        <td v-for="date in datesSet" :key="date">
+            <span v-if="formattedRentList[driver][date]">{{ formattedRentList[driver][date] }}</span>
+            <span v-else>0</span>
         </td>
     </tr>
 </base-table>
