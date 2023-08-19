@@ -60,4 +60,12 @@ export default {
     postCreateRent(rentData) {
         return axios.post(`http://127.0.0.1:8000/api/accounting/rent/create/`, rentData);
     },
+    getBalances(startDate, endDate) {
+        return axios.get(`http://127.0.0.1:8000/api/accounting/rents/balances/`, {
+            params: {
+                start_date: startDate,
+                end_date: endDate,
+            }
+        });
+    },
 }

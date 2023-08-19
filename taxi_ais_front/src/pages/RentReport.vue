@@ -20,6 +20,7 @@
     >
         <rent-table
             :rents="rentList"
+            :balances="balanceList"
         />
     </div>
     <div v-else>
@@ -43,6 +44,7 @@ export default {
             startDate: '',
             endDate: '',
             rentList: [],
+            balanceList: [],
             isRentsLoading: false,
             dialogVisible: false,
         }
@@ -58,6 +60,11 @@ export default {
             await requests.postCreateRent(rentData);
             await this.fetchRent();
         },
+        async fetchBalances(startDate, endDate) {
+            this.isRentsLoading = true;
+            this.balanceList = (await requests.getBalances(startDate, endDate)).data;
+            this.isRentsLoading = false;
+        },
         showDialog() {
             this.dialogVisible = true;
         },
@@ -70,8 +77,9 @@ export default {
             this.fetchRent(this.startDate, newDate);
         },
     },
-    async mounted() {
+    async beforeMount() {
         await this.fetchRent();
+        await this.fetchBalances();
         const firstDate = new Date(this.rentList[0].payment_date);
         const secondDate = new Date(this.rentList.at(-1).payment_date);
         firstDate.setDate(firstDate.getDate() - firstDate.getDay() + 1);
