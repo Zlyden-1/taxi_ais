@@ -72,6 +72,8 @@ class RentListAPITest(APITestCase):
         ),
     ]
 
+    balance_all_data = [OrderedDict([("driver", OrderedDict([("id", 1), ("name", "ewfehjy")])), ("balance", 7000.0)])]
+
     def setUp(self):
         driver = Driver.objects.create(name="ewfehjy", status=True)
         summ = 1000
@@ -85,12 +87,16 @@ class RentListAPITest(APITestCase):
             date(2023, 8, 13),
             date(2023, 8, 15),
         )
-        for i in dates:
-            Rent.objects.create(driver=driver, summ=summ, payment_date=i)
+        for n, i in enumerate(dates):
+            Rent.objects.create(driver=driver, summ=summ, payment_date=i, balance=n * summ)
 
-    def test_list_all(self):
+    def test_rent_list_all(self):
         response = self.client.get(f"/api/accounting/rents/?start_date=2022-1-1&&end_date=2024-1-1")
         self.assertEquals(response.data, self.list_all_responce_data)
+
+    def test_balance_list_all(self):
+        response = self.client.get(f"/api/accounting/rents/balances/?start_date=2022-1-1&&end_date=2024-1-1")
+        self.assertEquals(response.data, self.balance_all_data)
 
     # def test_list_for_last_week(self):
     #     response = self.client.get(f"/api/accounting/rents/")

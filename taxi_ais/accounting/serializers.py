@@ -27,3 +27,8 @@ class RentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rent
         fields = "__all__"
+
+
+class BalanceListSerializer(serializers.Serializer):
+    driver = DriverSerializer()
+    balance = serializers.FloatField()

@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Rent
-from .serializers import RentListSerializer, RentCreateSerializer
+from .serializers import RentListSerializer, RentCreateSerializer, BalanceListSerializer
 
 
 class RentListAPIView(ListAPIView):
@@ -57,3 +57,24 @@ class RentCreateAPIView(CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class BalanceListAPIView(ListAPIView):
+    serializer_class = BalanceListSerializer
+    queryset = Rent.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        today = timezone.localdate()
+        today_weekday = today.weekday()
+        last_week_end = today - timedelta(days=today_weekday + 1)
+        last_week_start = last_week_end - timedelta(days=6)
+        start_date = request.query_params.get("start_date", last_week_start)
+        end_date = request.query_params.get("end_date", last_week_end)
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(payment_date__gte=start_date, payment_date__lte=end_date)
+        unique_drivers = list({rent.driver for rent in queryset})
+        balances = []
+        for driver in unique_drivers:
+            balances.append({"driver": driver, "balance": queryset.filter(driver=driver).last().balance})
+        serializer = self.get_serializer(balances, many=True)
+        return Response(serializer.data)
