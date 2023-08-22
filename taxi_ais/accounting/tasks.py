@@ -9,11 +9,11 @@ from .models import Rent
 
 @shared_task
 def add_rent_task():
-    drivers = Driver.objects.filter(status=True)
+    drivers = Driver.objects.exclude(vehicle=None).filter(status=True)
     for driver in drivers:
         summ = -driver.vehicle.vehicle_type.rent_price
         try:
-            previous_rent = Rent.objects.filter(driver=driver).order_by('-payment_date', '-time').first()
+            previous_rent = Rent.objects.filter(driver=driver).order_by("-payment_date", "-time").first()
             if previous_rent is None:
                 balance = summ
             else:
@@ -25,7 +25,7 @@ def add_rent_task():
             payment_date=timezone.localdate(),
             time=timezone.localtime(),
             summ=summ,
-            comment='Автоматическое начисление аренды'
+            comment="Автоматическое начисление аренды",
         )
         rent.balance = balance
         rent.save()
@@ -37,12 +37,12 @@ def add_current_week_rents():
     drivers = Driver.objects.all()
     today = date.today()
     start = today - timedelta(days=today.isoweekday())
-    dates = [start + timedelta(days=d) for d in range(2, today.isoweekday()+1)]
+    dates = [start + timedelta(days=d) for d in range(2, today.isoweekday() + 1)]
     for date_ in dates:
         for driver in drivers:
             summ = -driver.vehicle.vehicle_type.rent_price
             try:
-                previous_rent = Rent.objects.filter(driver=driver).order_by('-payment_date', '-time').first()
+                previous_rent = Rent.objects.filter(driver=driver).order_by("-payment_date", "-time").first()
                 if previous_rent is None:
                     balance = summ
                 else:
@@ -52,10 +52,9 @@ def add_current_week_rents():
             rent = Rent.objects.create(
                 driver=driver,
                 payment_date=date_,
-                time=time(0,0,0),
+                time=time(0, 0, 0),
                 summ=summ,
-                comment=f'Автоматическое начисление аренды'
+                comment=f"Автоматическое начисление аренды",
             )
             rent.balance = balance
             rent.save()
-
