@@ -4,7 +4,7 @@
 
 <script>
 export default {
-    name: "base-input",
+    name: "inline-input",
     props: {
       modelValue: {
         type: [String, Number, Date],
@@ -30,9 +30,8 @@ export default {
 
 <style scoped>
 .input {
-    margin-top: 15px;
-    width: 100%;
-    border: 4px solid teal;
-    padding: 10px 15px;
-  }
+  border-radius: 5px;
+  border: 1px solid teal;
+  padding: 5px 5px;
+}
 </style>

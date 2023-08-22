@@ -1,6 +1,5 @@
 <template>
 <select :value="modelValue" @change="changeOption">
-    <option disabled selected hidden value="">Выберите из списка</option>
     <option 
         v-for="option in options" 
         :key="option.value" 
@@ -25,11 +24,17 @@ export default {
     },
     methods: {
         changeOption(event) {
-            this.$emit('update', event.target.value)
+            this.$emit('update:modelValue', event.target.value)
         }
     }
 }
 </script>
 
 <style scoped>
+select {
+    width: 100%;
+    border: 4px solid teal;
+    padding: 10px 15px;
+    margin-top: 15px;
+}
 </style>

@@ -1,2 +1,0 @@
-FROM nginx:stable-alpine3.17-slim
-COPY ./config/nginx /etc/nginx/templates

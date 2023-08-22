@@ -1,8 +1,10 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import MainPage from '@/pages/MainPage'
-import DriverList from '@/pages/DriverList'
-import VehicleList from '@/pages/VehicleList'
-import RentReport from '@/pages/RentReport'
+import { createRouter, createWebHistory } from 'vue-router';
+import MainPage from '@/pages/MainPage';
+import DriverList from '@/pages/DriverList';
+import VehicleList from '@/pages/VehicleList';
+import RentReport from '@/pages/RentReport';
+import DriverDetail from '@/pages/DriverDetail';
+import VehicleDetail from '@/pages/VehicleDetail';
 
 const routes = [
     {
@@ -14,8 +16,16 @@ const routes = [
         component: DriverList
     },
     {
+        path: '/references/driver/:id',
+        component: DriverDetail
+    },
+    {
         path: '/references/vehicles',
         component: VehicleList
+    },
+    {
+        path: '/references/vehicle/:VIN',
+        component: VehicleDetail
     },
     {
         path: '/accounting/rent',
