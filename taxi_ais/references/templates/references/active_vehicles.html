@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Транспортные средства</title>
+</head>
+<body>
+<h1>Транспортные средства</h1>
+<h2>Добавить ТС</h2>
+<form id="post_form" method="post" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <input type="submit" name="submit" value="Сохранить"/>
+</form>
+<div>
+    <h2>Все ТС</h2>
+    {% if vehicles %}
+    <button type="button">
+        <a href="{% url 'references:vehicles'%}">Показать неактивныe</a>
+    </button>
+    <table border="1">
+        <tr>
+            <td>VIN</td>
+            <td>Марка</td>
+            <td>Модель</td>
+            <td>Гос. номер</td>
+            <td>Статус</td>
+            <td>Действия</td>
+        </tr>
+        {% for vehicle in vehicles %}
+        <tr>
+            <td>{{ vehicle.VIN }}</td>
+            <td>{{ vehicle.vehicle_type.brand }}</td>
+            <td>{{ vehicle.vehicle_type.model }}</td>
+            <td>{{ vehicle.license_plate }}</td>
+            <td>{% if vehicle.status %}Активно{% else %}Неактивно{% endif %}</td>
+            <td>
+                <button type="button">
+                    <a href="{% url 'references:vehicle' vehicle.VIN %}">Подробности</a>
+                </button>
+                <button type="button">
+                    <a href="{% url 'references:delete_vehicle' vehicle.VIN %}">Удалить</a>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>ТС пока нет.</p>
+    {% endif %}
+</div>
+</body>
+</html>

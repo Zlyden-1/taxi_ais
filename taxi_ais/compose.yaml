@@ -1,0 +1,90 @@
+version: '3'
+
+services:
+  rabbitmq:
+    restart: always
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: taxi_ais
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  nginx:
+    image: m4vdoshin/taxi_ais:nginx
+    restart: always
+    depends_on:
+      - web
+    volumes:
+      # - ./config/nginx:/etc/nginx/templates
+      - media:/taxi_ais/media
+      - sockets:/taxi_ais/sockets
+    ports:
+      - "80:80"
+
+  web:
+    image: m4vdoshin/taxi_ais:test
+    volumes:
+      - media:/taxi_ais/media
+      - sockets:/taxi_ais/sockets
+    command: uwsgi --ini /taxi_ais/config/uwsgi/uwsgi.ini
+    environment:
+      - DJANGO_SETTINGS_MODULE=taxi_ais.settings.prod
+    depends_on:
+      - db
+    links:
+      - db
+
+  celery-worker:
+    image: m4vdoshin/taxi_ais:2.1
+    volumes:
+      - media:/taxi_ais/media
+    command:
+      celery -A taxi_ais worker -l INFO
+    environment:
+      - DJANGO_SETTINGS_MODULE=taxi_ais.settings.prod
+    depends_on:
+      - db
+      - rabbitmq
+    links:
+      - db
+      - rabbitmq
+
+  celery-beat:
+    image: m4vdoshin/taxi_ais:2.1
+    volumes:
+      - media:/taxi_ais/media
+    command:
+      celery -A taxi_ais beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      - DJANGO_SETTINGS_MODULE=taxi_ais.settings.prod
+    depends_on:
+      - db
+      - rabbitmq
+    links:
+      - db
+      - rabbitmq
+
+volumes:
+  rabbitmq:
+    driver: local
+  database:
+    driver: local
+  media:
+    driver: local
+  sockets:
+    driver: local

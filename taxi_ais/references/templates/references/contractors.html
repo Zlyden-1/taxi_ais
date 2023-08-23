@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Исполнители</title>
+</head>
+<body>
+<h1>Исполнители</h1>
+<div>
+    <h2>Внести нового исполнителя</h2>
+    <form action="{% url 'references:add_contractor' %}" method="post">
+        {% csrf_token %}
+        <fieldset>
+            <label for="Водитель">Водитель</label>
+            <select id="Водитель" name="driver">
+                {% if drivers %}
+                {% for driver in drivers %}
+                <option value="{{ driver.id }}">{{ driver }}</option>
+                {% endfor %}
+                {% else %}
+                <option value="null">Нет</option>
+                {% endif %}
+            </select>
+            <label for="ТС">ТС</label>
+            <select id="ТС" name="vehicle">
+                {% if vehicles %}
+                {% for vehicle in vehicles %}
+                <option value="{{ vehicle.VIN }}">{{ vehicle }}</option>
+                {% endfor %}
+                {% else %}
+                <option value="null">Нет</option>
+                {% endif %}
+            </select>
+            <label for="date">Дата аренды</label>
+            <input id="date" type="date" name="renting_date" required>
+            <button type="submit">Сохранить</button>
+        </fieldset>
+    </form>
+</div>
+<div>
+    <h2>Все исполнтели</h2>
+    {% if contractors %}
+    <table border="1">
+        {% for contractor in contractors %}
+        <tr>
+            <td>{{ contractor.id }}</td>
+            <td>{{ contractor.driver.name }}</td>
+            <td>{{ contractor.vehicle }}</td>
+            <td>{{ contractor.renting_date }}</td>
+            <td>
+                <button type="button">
+                    <a href="{% url 'references:contractor' contractor.id %}">Изменить</a>
+                </button>
+                <button type="button">
+                    <a href="{% url 'references:contractor' contractor.id %}/delete">Удалить</a>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Исполнителей пока нет.</p>
+    {% endif %}
+</div>
+</body>
+</html>

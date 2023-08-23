@@ -1,0 +1,20 @@
+upstream uwsgi_app {
+    server unix:/taxi_ais/sockets/uwsgi_app.sock;
+}
+server {
+    listen 80;
+    error_log stderr warn;
+    access_log /dev/stdout main;
+    location / {
+        include /etc/nginx/uwsgi_params;
+        uwsgi_pass uwsgi_app;
+    }
+    location /static {
+        autoindex on;
+        root /taxi_ais;
+    }
+    location /media {
+        autoindex on;
+        root /taxi_ais;
+    }
+}
