@@ -12,8 +12,8 @@ class RentAdmin(admin.ModelAdmin):
     ordering = ["-payment_date", "-time"]
     readonly_fields = ["driver", "payment_date", "time", "balance"]
 
-    # TODO: переопределить форму изменения
     def save_model(self, request, obj, form, change):
+        obj.save()
         previous_rent = (
             Rent.objects.filter(driver=obj.driver, payment_date=obj.payment_date, time__lt=obj.time)
             .order_by("payment_date", "time")
@@ -29,6 +29,7 @@ class RentAdmin(admin.ModelAdmin):
             for rent in rents:
                 if previous_rent:
                     rent.balance = rent.summ + previous_rent.balance
+                    print(rent.balance)
                 else:
                     rent.balance = rent.summ
                 previous_rent = rent
