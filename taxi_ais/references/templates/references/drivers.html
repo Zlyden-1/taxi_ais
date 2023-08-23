@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Водители</title>
+</head>
+<body>
+<h1>Водители</h1>
+<h2>Добавить водителя</h2>
+<form id="post_form" method="post" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <input type="submit" name="submit" value="Сохранить"/>
+</form>
+<div>
+    <h2>Все водители</h2>
+    {% if drivers %}
+    <button type="button">
+        <a href="{% url 'references:active_drivers'%}">Скрыть неактивных</a>
+    </button>
+    <table border="1">
+        <tr>
+            <td>id</td>
+            <td>Фамилия</td>
+            <td>Имя</td>
+            <td>Отчество</td>
+            <td>ФИО</td>
+            <td>Статус</td>
+            <td>Действия</td>
+        </tr>
+        {% for driver in drivers %}
+        <tr>
+            <td>{{ driver.id }}</td>
+            <td>{{ driver.second_name }}</td>
+            <td>{{ driver.first_name }}</td>
+            <td>{{ driver.patronimic }}</td>
+            <td>{{ driver.name }}</td>
+            <td>{% if driver.status %}Активен{% else %}Неактивен{% endif %}</td>
+            <td>
+                <button type="button">
+                    <a href="{% url 'references:driver' driver.id %}">Подробности</a>
+                </button>
+                <button type="button">
+                    <a href="{% url 'references:delete_driver' driver.id %}">Удалить</a>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Водителей пока нет.</p>
+    {% endif %}
+</div>
+</body>
+</html>

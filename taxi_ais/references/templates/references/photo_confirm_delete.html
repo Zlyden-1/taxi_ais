@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Удалить фото</title>
+</head>
+<body>
+<form method="post">{% csrf_token %}
+    <p>Подтвердите удаление этого фото:</p>
+    <img src="{{ object.photo.url }}">
+    {{ form }}
+    <input type="submit" value="Удалить">
+</form>
+</body>
+</html>
